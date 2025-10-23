@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>✏️ Edit Dream</h2>
+
+<form method="POST" style="max-width:600px; margin:auto; background:white; padding:25px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+    <textarea name="dream" rows="6" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc;">{{ dream['dream'] }}</textarea>
+    <br><br>
+    <button type="submit" style="background:#007BFF; color:white; padding:10px 20px; border:none; border-radius:8px;">💾 Save Changes</button>
+    <a href="{{ url_for('history') }}" style="margin-left:10px; text-decoration:none; color:#555;">Cancel</a>
+</form>
+{% endblock %}
