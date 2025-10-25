@@ -1,7 +1,7 @@
 --only-binary=:all:
 --extra-index-url https://download.pytorch.org/whl/cpu
 Flask==3.0.3
-pymongo==4.8.0
+pymongo==4.9.2
 dnspython==2.6.1
 Werkzeug==3.0.3
 gunicorn==23.0.0
