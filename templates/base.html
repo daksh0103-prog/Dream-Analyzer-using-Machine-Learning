@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <title>{{ title }}</title>
+    <style>
+        body {
+             font-family: 'Poppins', sans-serif;
+             margin: 0;
+             padding: 0;
+             background: linear-gradient(135deg, #e3f2fd, #fce4ec);
+             min-height: 100vh;
+             transition: background 0.5s;
+}
+/* ✅ Table Styling Fix */
+table {
+  border-spacing: 0;
+  border: none;
+  font-family: 'Poppins', sans-serif;
+}
+
+th, td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+tr:hover {
+  background-color: #f7f9ff;
+  transition: 0.2s;
+}
+
+/* 🌈 Icon Buttons */
+.action-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.icon-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 16px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.edit-btn {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.edit-btn:hover {
+  background-color: #e0a800;
+  color: white;
+  transform: scale(1.1);
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #b02a37;
+  transform: scale(1.1);
+}
+/* 🌙 Dream Modal Styling */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 8% auto;
+  padding: 25px;
+  border-radius: 15px;
+  width: 50%;
+  max-width: 600px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content h2 {
+  text-align: center;
+  color: #007bff;
+}
+
+.modal-content p {
+  font-size: 16px;
+  margin: 8px 0;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #000;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: scale(0.9);}
+  to {opacity: 1; transform: scale(1);}
+}
+
+/* 👁️ View Button */
+.view-btn {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.view-btn:hover {
+  background-color: #138496;
+  transform: scale(1.1);
+}
+
+
+
+
+        /* ✅ NAVBAR STYLE */
+       nav {
+           background: linear-gradient(90deg, #007bff, #00c9ff);
+           color: white;
+           padding: 15px 0;
+           text-align: center;
+           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+           position: sticky;
+           top: 0;
+           z-index: 1000;
+           animation: slideDown 0.8s ease-in-out;
+}
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 20px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #ffe082;
+        }
+
+        @keyframes slideDown {
+            from {transform: translateY(-100%);}
+            to {transform: translateY(0);}
+}
+        .container {
+            padding: 40px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 🌟 NAVBAR -->
+    <nav>
+        {% if current_user.is_authenticated %}
+            <a href="/">🧠 Dream Analyzer</a>
+            <a href="/history">📜 Saved Dreams</a>
+            <a href="/analytics">📊 Analytics</a>
+            <a href="/personality">💫 Personality</a>
+            <a href="/logout">🚪 Logout ({{ current_user.username }})</a>
+            <div style="float:right; margin-right:15px; font-weight:600;">
+
+        {% else %}
+            <a href="/login">🔑 Login</a>
+            <a href="/register">🆕 Register</a>
+        {% endif %}
+    </nav>
+
+    {% if current_user.streak_count %}
+  {% set streak = current_user.streak_count %}
+{% else %}
+  {% set streak = 0 %}
+{% endif %}
+
+{% if streak < 7 %}
+  {% set goal = 7 %}
+{% elif streak < 30 %}
+  {% set goal = 30 %}
+{% else %}
+  {% set goal = 50 %}
+{% endif %}
+
+<div class="streak-visual">
+  <div class="streak-label">
+    <span>🌙 Dream Streak</span>
+    <span>{{ streak }}/{{ goal }} days</span>
+  </div>
+
+  <div class="streak-bar">
+    <div class="streak-fill" 
+         style="width: {{ (streak / goal) * 100 if streak < goal else 100 }}%;">
+    </div>
+  </div>
+</div>
+
+    <!-- 🌟 PAGE CONTENT -->
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+<footer style="text-align:center; padding:15px; color:#555; font-size:14px;">
+    Made with 💙 by Daksh Chanana
+</footer>
+</body>
+</html>
