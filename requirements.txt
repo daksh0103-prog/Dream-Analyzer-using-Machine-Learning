@@ -3,7 +3,8 @@ pymongo==4.8.0
 dnspython==2.6.1
 Werkzeug==3.0.3
 gunicorn==23.0.0
-transformers==4.44.2
-torch==2.4.0
+transformers==4.41.0
+torch==2.2.0
 bson==0.5.10
 requests==2.32.3
+python-dotenv==1.0.1
