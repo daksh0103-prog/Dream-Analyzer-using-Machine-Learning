@@ -12,7 +12,7 @@ def query_hf_model(model_name, payload, retries=3, timeout=60):
         try:
             res = requests.post(
                 f"https://api-inference.huggingface.co/models/{EMOTION_MODEL}",
-                f"https://api-inference.huggingface.co/models/{GENERATION_MODEL}"
+                f"https://api-inference.huggingface.co/models/{GENERATION_MODEL}",
                 headers=HEADERS,
                 json=payload,
                 timeout=timeout
