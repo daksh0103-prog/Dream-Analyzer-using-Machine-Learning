@@ -186,33 +186,6 @@ tr:hover {
         {% endif %}
     </nav>
 
-    {% if current_user.streak_count %}
-  {% set streak = current_user.streak_count %}
-{% else %}
-  {% set streak = 0 %}
-{% endif %}
-
-{% if streak < 7 %}
-  {% set goal = 7 %}
-{% elif streak < 30 %}
-  {% set goal = 30 %}
-{% else %}
-  {% set goal = 50 %}
-{% endif %}
-
-<div class="streak-visual">
-  <div class="streak-label">
-    <span>🌙 Dream Streak</span>
-    <span>{{ streak }}/{{ goal }} days</span>
-  </div>
-
-  <div class="streak-bar">
-    <div class="streak-fill" 
-         style="width: {{ (streak / goal) * 100 if streak < goal else 100 }}%;">
-    </div>
-  </div>
-</div>
-
     <!-- 🌟 PAGE CONTENT -->
     <div class="container">
         {% block content %}{% endblock %}
@@ -222,3 +195,4 @@ tr:hover {
 </footer>
 </body>
 </html>
+
