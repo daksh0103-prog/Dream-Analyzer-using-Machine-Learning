@@ -68,7 +68,6 @@ def analyze():
 
     except Exception as e:
         print("❌ Error in analyze route:", e)
-        return render_template("error.html", error=str(e)), 500
 
 
 # ----------------------------
