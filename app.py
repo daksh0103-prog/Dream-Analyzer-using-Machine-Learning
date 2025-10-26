@@ -68,7 +68,7 @@ def analyze():
 
     except Exception as e:
         print("❌ Error in analyze route:", e)
-
+        return render_template("index.html", result=f"An error occurred: {e}")
 
 # ----------------------------
 # View Saved Dreams Route
