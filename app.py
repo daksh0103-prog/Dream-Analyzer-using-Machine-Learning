@@ -44,7 +44,6 @@ def home():
 # ----------------------------
 @app.route("/analyze", methods=["POST"])
 @login_required
-@app.route("/analyze", methods=["POST"])
 def analyze():
     dream_text = request.form.get("dream", "").strip()
 
