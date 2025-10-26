@@ -1,13 +1,22 @@
-import requests, os
+import requests
+import os
 
+# Get Hugging Face token from environment
 HF_TOKEN = os.getenv("HF_TOKEN")
 HEADERS = {"Authorization": f"Bearer {HF_TOKEN}"}
 
+# Models
 EMOTION_MODEL = "bhadresh-savani/distilbert-base-uncased-emotion"
-GENERATION_MODEL = "google/flan-t5-base"
+GENERATION_MODEL = "sshleifer/tiny-flan-t5"
 
 
 def analyze_dream(dream_text):
+    """
+    Analyze emotions in a dream using distilbert-base-uncased-emotion
+    Returns:
+        result_text: human-readable string
+        analysis: dict with primary and secondary emotions and confidence
+    """
     try:
         payload = {"inputs": dream_text}
         res = requests.post(
@@ -17,25 +26,23 @@ def analyze_dream(dream_text):
             timeout=30
         )
 
-        # Check if response is OK
         if res.status_code != 200:
             print("Error in emotion model:", res.text)
             return "Sorry, I couldn’t analyze emotions right now.", None
 
         data = res.json()
-        # Handle model warm-up or empty response
-        if not data or isinstance(data, dict) and "error" in data:
+        if not data or (isinstance(data, dict) and "error" in data):
             print("Model returned error:", data)
-            return "The model is warming up. Try again in a few seconds.", None
+            return "The model is warming up. Try again shortly.", None
 
-        emotions = data[0]
-        top = sorted(emotions, key=lambda x: x["score"], reverse=True)
+        # Sort emotions by score
+        top = sorted(data[0], key=lambda x: x["score"], reverse=True)
         top1, top2 = top[0], top[1]
 
         result_text = (
             f"Your dream mainly reflects **{top1['label'].lower()}** "
-            f"(confidence: {round(top1['score'], 2)})"
-            f", and hints of **{top2['label'].lower()}** "
+            f"(confidence: {round(top1['score'], 2)}), "
+            f"and hints of **{top2['label'].lower()}** "
             f"(confidence: {round(top2['score'], 2)})."
         )
 
@@ -54,6 +61,10 @@ def analyze_dream(dream_text):
 
 
 def interpret_dream(dream_text):
+    """
+    Interpret a dream positively using tiny-flan-t5
+    Returns a string of interpretation, or a fallback message if it fails
+    """
     try:
         payload = {"inputs": f"Interpret this dream positively:\n{dream_text}"}
         res = requests.post(
@@ -65,19 +76,19 @@ def interpret_dream(dream_text):
 
         if res.status_code != 200:
             print("Error in interpretation model:", res.text)
-            return "Sorry, I couldn’t interpret the dream right now."
+            return "Interpretation not available"
 
         data = res.json()
-        if not data or isinstance(data, dict) and "error" in data:
+        if not data or (isinstance(data, dict) and "error" in data):
             print("Model returned error:", data)
-            return "The interpretation model is still loading. Try again soon."
+            return "Interpretation not available"
 
         text = data[0].get("generated_text", "").strip()
         if not text:
-            return "The model didn’t generate a clear interpretation."
+            return "Interpretation not available"
 
         return text
 
     except Exception as e:
         print("Error in interpret_dream:", e)
-        return "An unexpected error occurred while interpreting your dream."
+        return "Interpretation not available"
