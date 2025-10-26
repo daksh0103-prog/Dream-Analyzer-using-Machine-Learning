@@ -4,7 +4,7 @@ HF_TOKEN = os.getenv("HF_TOKEN")
 HEADERS = {"Authorization": f"Bearer {HF_TOKEN}"}
 
 EMOTION_MODEL = "bhadresh-savani/distilbert-base-uncased-emotion"
-GENERATION_MODEL = "google/flan-t5-small"
+GENERATION_MODEL = "google/flan-t5-base"
 
 
 def analyze_dream(dream_text):
