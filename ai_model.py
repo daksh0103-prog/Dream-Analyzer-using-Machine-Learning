@@ -1,33 +1,25 @@
+import requests
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
-import requests
 import os
 
-# -------------------------------
-# Hugging Face token (for emotion API)
+# Hugging Face token for emotion API
 HF_TOKEN = os.getenv("HF_TOKEN")
 HEADERS = {"Authorization": f"Bearer {HF_TOKEN}"}
 
-# Emotion analysis model (still via HF API)
+# Emotion model (remote)
 EMOTION_MODEL = "bhadresh-savani/distilbert-base-uncased-emotion"
 
-# Local dream interpretation model
+# Local interpretation model
 INTERPRET_MODEL_NAME = "sshleifer/tiny-flan-t5"
-
-# Load tokenizer and model once at startup
 tokenizer_interp = AutoTokenizer.from_pretrained(INTERPRET_MODEL_NAME)
 model_interp = AutoModelForSeq2SeqLM.from_pretrained(INTERPRET_MODEL_NAME)
-# Use GPU if available
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model_interp.to(device)
-# -------------------------------
+
 
 # -------------------------------
 def analyze_dream(dream_text):
-    """
-    Analyze emotions in a dream using distilbert-base-uncased-emotion.
-    Returns a human-readable result and a dict of primary and secondary emotions.
-    """
     try:
         payload = {"inputs": dream_text}
         res = requests.post(
@@ -43,7 +35,7 @@ def analyze_dream(dream_text):
 
         data = res.json()
         if not data or (isinstance(data, dict) and "error" in data):
-            print("Model returned error:", data)
+            print("Emotion model returned error:", data)
             return "The model is warming up. Try again shortly.", None
 
         top = sorted(data[0], key=lambda x: x["score"], reverse=True)
@@ -69,23 +61,17 @@ def analyze_dream(dream_text):
         print("Error in analyze_dream:", e)
         return "Sorry, an unexpected error occurred while analyzing.", None
 
+
 # -------------------------------
 def interpret_dream(dream_text):
-    """
-    Interpret dream using local tiny-flan-t5 model.
-    Returns interpretation text, or fallback if generation fails.
-    """
     try:
         inputs = tokenizer_interp(
             f"Interpret this dream positively:\n{dream_text}",
             return_tensors="pt"
         ).to(device)
-
         outputs = model_interp.generate(**inputs, max_length=200)
         text = tokenizer_interp.decode(outputs[0], skip_special_tokens=True)
-
         return text or "Interpretation not available"
-
     except Exception as e:
         print("Error in interpret_dream:", e)
         return "Interpretation not available"
