@@ -6,8 +6,9 @@ pymongo==4.9.2
 dnspython==2.6.1
 Werkzeug==3.0.3
 gunicorn==23.0.0
-tokenizers==0.19.1
-transformers==4.44.2
+tokenizers==0.20.3
+transformers==4.45.2
 torch==2.5.1+cpu
 requests==2.32.3
 python-dotenv==1.0.1
+
