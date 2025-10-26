@@ -81,38 +81,5 @@ button:hover {
   transition: 0.2s ease;
 }
 
-/* 🌙 Dream Streak Bar */
-.streak-visual {
-  width: 70%;
-  max-width: 600px;
-  margin: 30px auto;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 15px;
-  padding: 20px 25px;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-}
 
-.streak-label {
-  display: flex;
-  justify-content: space-between;
-  font-weight: 600;
-  color: #2c2c54;
-  margin-bottom: 10px;
-}
-
-.streak-bar {
-  width: 100%;
-  background: #e3e3e3;
-  border-radius: 20px;
-  height: 18px;
-  overflow: hidden;
-}
-
-.streak-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #00b4d8, #0077b6);
-  border-radius: 20px;
-  transition: width 0.6s ease-in-out;
-}
 
