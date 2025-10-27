@@ -4,7 +4,7 @@ from bson import ObjectId
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 
-MONGO_URI = os.getenv("mongodb+srv://daksh0103:daksh0103@cluster0.7ztzqij.mongodb.net/?retryWrites=true&w=majority&ssl=true&tlsAllowInvalidCertificates=true")
+MONGO_URI = os.getenv("mongodb+srv://daksh0103:1st march 2006@cluster0.7ztzqij.mongodb.net/dream_analyzer?retryWrites=true&w=majority")
 if not MONGO_URI:
     raise RuntimeError("MONGO_URI environment variable not set — set it in Render or .env")
 
