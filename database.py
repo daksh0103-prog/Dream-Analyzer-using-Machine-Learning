@@ -115,3 +115,21 @@ class MongoDB:
     def get_achievements(self, username):
         user = self.get_user(username)
         return user.get("achievements", []) if user else []
+
+    def get_dream_by_id(self, dream_id):
+    try:
+        return self.dreams_collection.find_one({"_id": ObjectId(dream_id)})
+    except Exception:
+        return None
+
+
+    def update_dream(self, dream_id, updated_data):
+       self.dreams_collection.update_one(
+        {"_id": ObjectId(dream_id)},
+        {"$set": updated_data}
+    )
+
+
+   def delete_dream(self, dream_id):
+      self.dreams_collection.delete_one({"_id": ObjectId(dream_id)})
+
