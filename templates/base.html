@@ -177,7 +177,7 @@ tr:hover {
             <a href="/history">📜 Saved Dreams</a>
             <a href="/analytics">📊 Analytics</a>
             <a href="/personality">💫 Personality</a>
-            <a href="/logout">🚪 Logout ({{ current_user.username }})</a>
+            <a href="/logout">🚪 Logout ({{ session['user'] }})</a>
             <div style="float:right; margin-right:15px; font-weight:600;">
 
         {% else %}
@@ -195,5 +195,6 @@ tr:hover {
 </footer>
 </body>
 </html>
+
 
 
