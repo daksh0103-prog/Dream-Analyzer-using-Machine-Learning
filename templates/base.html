@@ -172,7 +172,7 @@ tr:hover {
 
     <!-- 🌟 NAVBAR -->
     <nav>
-        {% if current_user.is_authenticated %}
+        {% if session.get('user') %}
             <a href="/">🧠 Dream Analyzer</a>
             <a href="/history">📜 Saved Dreams</a>
             <a href="/analytics">📊 Analytics</a>
@@ -195,4 +195,5 @@ tr:hover {
 </footer>
 </body>
 </html>
+
 
