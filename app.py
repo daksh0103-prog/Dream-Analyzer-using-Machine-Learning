@@ -125,6 +125,58 @@ def history():
     )
 
 
+# ----------------- EDIT DREAM -----------------
+@app.route("/edit_dream/<dream_id>", methods=["GET", "POST"])
+def edit_dream(dream_id):
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    dream = db.get_dream_by_id(dream_id)
+    if not dream:
+        flash("Dream not found.", "danger")
+        return redirect(url_for("history"))
+
+    if request.method == "POST":
+        new_text = request.form.get("dream_text", "").strip()
+        if not new_text:
+            flash("Dream text cannot be empty.", "warning")
+            return redirect(url_for("edit_dream", dream_id=dream_id))
+
+        try:
+            # Re-analyze dream using AI
+            new_interpretation = dream_ai.interpret_dream(new_text)
+            new_emotion = dream_ai.analyze_emotion(new_text)
+
+            db.update_dream(dream_id, {
+                "dream": new_text,
+                "interpretation": new_interpretation,
+                "analysis": new_emotion,
+                "timestamp": datetime.utcnow()
+            })
+
+            flash("Dream updated successfully!", "success")
+        except Exception as e:
+            flash(f"Error updating dream: {str(e)}", "danger")
+
+        return redirect(url_for("history"))
+
+    return render_template("edit_dream.html", dream=dream)
+
+
+# ----------------- DELETE DREAM -----------------
+@app.route("/delete_dream/<dream_id>")
+def delete_dream(dream_id):
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    try:
+        db.delete_dream(dream_id)
+        flash("Dream deleted successfully!", "success")
+    except Exception as e:
+        flash(f"Error deleting dream: {str(e)}", "danger")
+
+    return redirect(url_for("history"))
+
 @app.route("/api/dreams")
 def api_dreams():
     """Optional JSON API route for debugging or frontend use"""
