@@ -1,3 +1,4 @@
+from database import create_user, verify_user, save_dream, update_streak, check_achievements
 from pymongo import MongoClient, errors
 import os
 from bson import ObjectId
