@@ -130,8 +130,6 @@ class MongoDB:
     )
 
 
-    from bson import ObjectId
-
     def delete_dream(self, dream_id):
         print(f"🧠 Trying to delete dream with ID: {dream_id}")
         try:
