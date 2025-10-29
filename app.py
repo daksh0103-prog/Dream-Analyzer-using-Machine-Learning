@@ -165,7 +165,6 @@ def edit_dream(dream_id):
 
 # ----------------- DELETE DREAM -----------------
 @app.route("/delete_dream/<dream_id>", methods=["GET","POST"])
-@login_required
 def delete_dream(dream_id):
     if "user" not in session:
         return redirect(url_for("login"))
