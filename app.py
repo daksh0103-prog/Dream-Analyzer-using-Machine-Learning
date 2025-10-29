@@ -164,7 +164,7 @@ def edit_dream(dream_id):
 
 
 # ----------------- DELETE DREAM -----------------
-@app.route("/delete_dream/<dream_id>")
+@app.route("/delete_dream/<dream_id>", methods=["POST"])
 def delete_dream(dream_id):
     if "user" not in session:
         return redirect(url_for("login"))
@@ -176,6 +176,7 @@ def delete_dream(dream_id):
         flash(f"Error deleting dream: {str(e)}", "danger")
 
     return redirect(url_for("history"))
+
 
 @app.route("/api/dreams")
 def api_dreams():
