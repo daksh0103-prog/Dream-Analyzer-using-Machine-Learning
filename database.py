@@ -126,7 +126,7 @@ class MongoDB:
         print(f"✏️ Trying to update dream with ID: {dream_id}")
         try:
             result = self.dreams.update_one(
-                {"_id": ObjectId(dream_id)},
+              {"_id": ObjectId(dream_id)},
                 {"$set": updated_data}
             )
             print("✅ Dream updated using ObjectId")
@@ -147,7 +147,7 @@ class MongoDB:
         try:
             self.dreams.delete_one({"_id": ObjectId(dream_id)})
             print("✅ Dream deleted using ObjectId")
-       except Exception as e:
+        except Exception as e:
             print(f"⚠️ Not a valid ObjectId, deleting as string: {e}")
             self.dreams.delete_one({"_id": dream_id})
 
