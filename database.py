@@ -133,13 +133,11 @@ class MongoDB:
     def delete_dream(self, dream_id):
         print(f"🧠 Trying to delete dream with ID: {dream_id}")
         try:
-            # Try ObjectId first
-            result = self.dreams_collection.delete_one({"_id": ObjectId(dream_id)})
+            self.dreams.delete_one({"_id": ObjectId(dream_id)})
+            print("✅ Dream deleted using ObjectId")
         except Exception as e:
-            print("⚠️ Not a valid ObjectId, deleting as string:", e)
-            result = self.dreams_collection.delete_one({"_id": dream_id})
-
-        print(f"✅ Delete result: {result.deleted_count} document(s) deleted")
+            print(f"⚠️ Not a valid ObjectId, deleting as string: {e}")
+            self.dreams.delete_one({"_id": dream_id})
 
 
 
