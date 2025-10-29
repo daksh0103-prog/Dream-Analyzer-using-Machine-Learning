@@ -122,7 +122,6 @@ class MongoDB:
        except Exception:
           return None
 
-
     def update_dream(self, dream_id, updated_data):
         print(f"✏️ Trying to update dream with ID: {dream_id}")
         try:
@@ -138,6 +137,7 @@ class MongoDB:
                 {"$set": updated_data}
             )
         return result.modified_count > 0
+
 
 
 
