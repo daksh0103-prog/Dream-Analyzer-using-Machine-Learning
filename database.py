@@ -119,7 +119,7 @@ class MongoDB:
     def get_dream_by_id(self, dream_id):
         print(f"🔍 Searching dream with ID: {dream_id}")
         try:
-            dream = self.dreams_collection.find_one({"_id": ObjectId(dream_id)})
+            dream = self.dreams.find_one({"_id": ObjectId(dream_id)})
             if dream:
                 print("✅ Found dream using ObjectId")
                 return dream
@@ -127,7 +127,7 @@ class MongoDB:
             print(f"⚠️ Invalid ObjectId: {e}")
 
     # Fallback to string-based lookup
-        dream = self.dreams_collection.find_one({"_id": dream_id})
+        dream = self.dreams.find_one({"_id": dream_id})
         if dream:
             print("✅ Found dream using string _id")
             return dream
