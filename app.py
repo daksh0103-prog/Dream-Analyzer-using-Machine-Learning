@@ -169,7 +169,7 @@ def edit_dream(dream_id):
         return redirect(url_for("history"))
 
     if request.method == "POST":
-        updated_text = request.form["dream"]
+        updated_text = request.form["dream_text"]
         analysis, interpretation = analyze_dream(updated_text)
 
         # ✅ Create document structure matching your history.html
