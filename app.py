@@ -205,7 +205,7 @@ def edit_dream(dream_id):
         flash("Dream updated successfully!", "success")
         return redirect(url_for("history"))
 
-    return render_template("edit.html", dream=dream)
+    return render_template("edit_dream.html", dream=dream)
 
 
 # ----------------- DELETE DREAM -----------------
