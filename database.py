@@ -161,7 +161,7 @@ class MongoDB:
         try:
             self.dreams.delete_one({"_id": ObjectId(dream_id)})
             print("✅ Dream deleted using ObjectId")
-       except Exception as e:
+        except Exception as e:
             print(f"⚠️ Not a valid ObjectId, deleting as string: {e}")
             self.dreams.delete_one({"_id": dream_id})
 
