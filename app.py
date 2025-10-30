@@ -162,7 +162,7 @@ def history():
 # ----------------- EDIT DREAM -----------------
 @app.route("/edit_dream/<dream_id>", methods=["GET", "POST"])
 def edit_dream(dream_id):
-    dream = collection.find_one({"_id": ObjectId(dream_id)})
+    dream = db.db.dreams.find_one({"_id": ObjectId(dream_id)})
 
     if not dream:
         flash("Dream not found.", "danger")
@@ -186,7 +186,7 @@ def edit_dream(dream_id):
         }
 
         # ✅ Update MongoDB properly
-        collection.update_one({"_id": ObjectId(dream_id)}, {"$set": updated_dream})
+        db.db.dreams.update_one({"_id": ObjectId(dream_id)}, {"$set": updated_dream})
 
         flash("Dream updated successfully!", "success")
         return redirect(url_for("history"))
