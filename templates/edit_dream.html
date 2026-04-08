@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Edit Dream{% endblock %}
+{% block content %}
+<div style="max-width:620px; margin:0 auto;">
+  <div class="fade-up" style="margin-bottom:1.5rem;">
+    <a href="{{ url_for('history') }}" style="color:var(--muted); text-decoration:none; font-size:0.85rem;">← Back to Journal</a>
+    <h1 class="page-heading" style="margin-top:0.75rem;">Edit <em>Dream</em></h1>
+    <p class="page-sub">Re-analyze your dream with updated text.</p>
+  </div>
+
+  <div class="card fade-up fade-up-1">
+    <form method="POST" id="editForm">
+      <div class="form-group">
+        <label>Dream Text</label>
+        <textarea name="dream" required maxlength="1000">{{ dream.text }}</textarea>
+      </div>
+
+      {% if dream.interpretation %}
+      <div style="background:var(--surface); border-radius:10px; padding:1rem; margin-bottom:1.25rem;">
+        <p style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:0.4rem;">Previous Interpretation</p>
+        <p style="font-family:var(--font-head); font-size:0.95rem; font-weight:300; color:var(--muted); line-height:1.6;">{{ dream.interpretation }}</p>
+      </div>
+      {% endif %}
+
+      <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+        <button class="btn btn-primary" type="submit">Re-analyze &amp; Save →</button>
+        <a href="{{ url_for('history') }}" class="btn btn-ghost">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

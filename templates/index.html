@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}Analyze{% endblock %}
+{% block extra_head %}
+<style>
+  .analyze-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+  @media(min-width:700px) { .analyze-grid { grid-template-columns: 1fr 1fr; } }
+
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .result-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+
+  .result-text {
+    font-family: var(--font-head);
+    font-size: 1.15rem;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--text);
+  }
+
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(7,8,15,0.8);
+    backdrop-filter: blur(8px);
+    z-index: 999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+  .loading-overlay.active { display: flex; }
+
+  .spinner {
+    width: 48px; height: 48px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-family: var(--font-head);
+    font-size: 1.2rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .confidence-bar {
+    height: 4px;
+    background: var(--surface);
+    border-radius: 2px;
+    margin-top: 0.4rem;
+    overflow: hidden;
+  }
+  .confidence-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.8s ease;
+  }
+
+  .char-counter {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: right;
+    margin-top: 0.3rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p class="loading-text">Interpreting your dream…</p>
+</div>
+
+<div class="fade-up">
+  <h1 class="page-heading">
+    What did you <em>dream</em>?
+  </h1>
+  <p class="page-sub">Describe your dream and let AI uncover its meaning and emotions.</p>
+</div>
+
+<!-- Input form -->
+<div class="card fade-up fade-up-1" style="margin-bottom:1.5rem;">
+  <form method="POST" id="dreamForm">
+    <div class="form-group" style="margin-bottom:0.5rem;">
+      <label>Your Dream</label>
+      <textarea name="dream" id="dreamText" placeholder="I was standing at the edge of a vast ocean, and the sky turned violet…" maxlength="1000">{% if result %}{{ result.text }}{% endif %}</textarea>
+      <div class="char-counter"><span id="charCount">0</span> / 1000</div>
+    </div>
+    <button class="btn btn-primary" type="submit" id="submitBtn">
+      ✦ Analyze Dream
+    </button>
+  </form>
+</div>
+
+<!-- Results -->
+{% if result %}
+<div style="margin-bottom:1rem;" class="fade-up">
+  <p style="font-size:0.8rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem;">Analysis Results</p>
+  <div class="analyze-grid">
+
+    <div class="result-card">
+      <div class="result-label">✦ Interpretation</div>
+      <p class="result-text">{{ result.interpretation }}</p>
+    </div>
+
+    <div class="result-card">
+      <div class="result-label">◈ Emotion Analysis</div>
+
+      <div style="margin-bottom:1rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="emotion-badge emo-{{ result.emotion.primary }}">{{ result.emotion.primary }}</span>
+          <span style="font-size:0.8rem; color:var(--muted);">{{ (result.emotion.confidence_primary * 100)|int }}%</span>
+        </div>
+        <div class="confidence-bar">
+          <div class="confidence-fill" style="width:{{ (result.emotion.confidence_primary * 100)|int }}%"></div>
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="emotion-badge emo-{{ result.emotion.secondary }}" style="opacity:0.7;">{{ result.emotion.secondary }}</span>
+          <span style="font-size:0.8rem; color:var(--muted);">{{ (result.emotion.confidence_secondary * 100)|int }}%</span>
+        </div>
+        <div class="confidence-bar">
+          <div class="confidence-fill" style="width:{{ (result.emotion.confidence_secondary * 100)|int }}%; opacity:0.6;"></div>
+        </div>
+      </div>
+
+      <hr style="margin:1rem 0;">
+      <p style="font-size:0.8rem; color:var(--muted);">Dream saved to your journal.</p>
+      <a href="{{ url_for('history') }}" class="btn btn-ghost btn-sm" style="margin-top:0.5rem;">View History →</a>
+    </div>
+
+  </div>
+</div>
+{% endif %}
+
+<script>
+  const textarea = document.getElementById('dreamText');
+  const counter  = document.getElementById('charCount');
+  const form     = document.getElementById('dreamForm');
+  const overlay  = document.getElementById('loadingOverlay');
+
+  function updateCount() { counter.textContent = textarea.value.length; }
+  textarea.addEventListener('input', updateCount);
+  updateCount();
+
+  form.addEventListener('submit', () => {
+    if (textarea.value.trim()) overlay.classList.add('active');
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Server Error{% endblock %}
+{% block content %}
+<div style="text-align:center; padding:5rem 2rem;" class="fade-up">
+  <div style="font-family:var(--font-head); font-size:8rem; font-weight:300; color:var(--border); line-height:1;">500</div>
+  <h2 style="font-family:var(--font-head); font-size:1.8rem; font-weight:300; margin-bottom:0.5rem;">The dream <em>shattered</em></h2>
+  <p style="color:var(--muted); margin-bottom:2rem;">Something went wrong on our end.</p>
+  <a href="{{ url_for('index') }}" class="btn btn-primary">← Back Home</a>
+</div>
+{% endblock %}

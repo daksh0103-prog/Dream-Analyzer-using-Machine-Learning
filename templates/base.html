@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Somnia{% endblock %} · Dream Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ── Variables ── */
+    :root {
+      --bg:        #07080f;
+      --surface:   #0e1020;
+      --card:      #13162a;
+      --border:    rgba(120,110,200,0.18);
+      --accent:    #a78bfa;
+      --accent2:   #f0abfc;
+      --gold:      #e2c97e;
+      --text:      #e8e6f0;
+      --muted:     #7b7a8e;
+      --danger:    #f87171;
+      --success:   #6ee7b7;
+      --radius:    14px;
+      --font-head: 'Cormorant Garamond', serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ── Stars background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 25%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 40% 75%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 85%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 90%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 15% 80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(2px 2px at 35% 55%, rgba(167,139,250,0.4) 0%, transparent 100%),
+        radial-gradient(2px 2px at 75% 35%, rgba(240,171,252,0.3) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Navbar ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7,8,15,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .nav-brand span { color: var(--gold); }
+
+    .nav-links { display: flex; gap: 0.25rem; align-items: center; }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 400;
+      padding: 0.4rem 0.85rem;
+      border-radius: 8px;
+      transition: color 0.2s, background 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .nav-links a:hover { color: var(--text); background: rgba(167,139,250,0.1); }
+    .nav-links a.active { color: var(--accent); }
+
+    .nav-logout {
+      background: rgba(248,113,113,0.1) !important;
+      color: var(--danger) !important;
+      border: 1px solid rgba(248,113,113,0.2);
+    }
+    .nav-logout:hover { background: rgba(248,113,113,0.2) !important; }
+
+    /* ── Main wrapper ── */
+    main {
+      flex: 1;
+      position: relative;
+      z-index: 1;
+      padding: 2.5rem 1.5rem;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: all 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #07080f;
+    }
+    .btn-primary:hover { background: #c4b5fd; transform: translateY(-1px); }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-danger {
+      background: rgba(248,113,113,0.15);
+      border: 1px solid rgba(248,113,113,0.3);
+      color: var(--danger);
+    }
+    .btn-danger:hover { background: rgba(248,113,113,0.25); }
+
+    .btn-sm { padding: 0.4rem 0.85rem; font-size: 0.8rem; }
+
+    /* ── Form elements ── */
+    .form-group { margin-bottom: 1.25rem; }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    input[type="text"], input[type="password"], textarea {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(167,139,250,0.15);
+    }
+    textarea { resize: vertical; min-height: 130px; }
+
+    /* ── Flash messages ── */
+    .flashes { margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .flash {
+      padding: 0.75rem 1.1rem;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      border-left: 3px solid;
+    }
+    .flash.error   { background: rgba(248,113,113,0.1);  border-color: var(--danger);  color: #fca5a5; }
+    .flash.success { background: rgba(110,231,183,0.1);  border-color: var(--success); color: #6ee7b7; }
+    .flash.info    { background: rgba(167,139,250,0.1);  border-color: var(--accent);  color: #c4b5fd; }
+
+    /* ── Page heading ── */
+    .page-heading {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 300;
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    .page-heading em { font-style: italic; color: var(--accent); }
+    .page-sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    /* ── Emotion badge ── */
+    .emotion-badge {
+      display: inline-block;
+      padding: 0.25rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: capitalize;
+      letter-spacing: 0.04em;
+    }
+    .emo-joy      { background: rgba(253,224,71,0.15);  color: #fde047; }
+    .emo-sadness  { background: rgba(96,165,250,0.15);  color: #93c5fd; }
+    .emo-fear     { background: rgba(167,139,250,0.15); color: #c4b5fd; }
+    .emo-anger    { background: rgba(248,113,113,0.15); color: #fca5a5; }
+    .emo-surprise { background: rgba(52,211,153,0.15);  color: #6ee7b7; }
+    .emo-disgust  { background: rgba(251,146,60,0.15);  color: #fdba74; }
+    .emo-neutral  { background: rgba(148,163,184,0.15); color: #cbd5e1; }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--muted);
+      font-size: 0.78rem;
+      border-top: 1px solid var(--border);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.5s ease both; }
+    .fade-up-1 { animation-delay: 0.1s; }
+    .fade-up-2 { animation-delay: 0.2s; }
+    .fade-up-3 { animation-delay: 0.3s; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      nav { padding: 0 1rem; }
+      .nav-brand { font-size: 1.2rem; }
+      main { padding: 1.5rem 1rem; }
+      .card { padding: 1.25rem; }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="{{ url_for('index') }}">Som<span>nia</span></a>
+  {% if session.get('user_id') %}
+  <div class="nav-links">
+    <a href="{{ url_for('index') }}" {% if request.endpoint=='index' %}class="active"{% endif %}>Analyze</a>
+    <a href="{{ url_for('history') }}" {% if request.endpoint=='history' %}class="active"{% endif %}>History</a>
+    <a href="{{ url_for('analytics') }}" {% if request.endpoint=='analytics' %}class="active"{% endif %}>Analytics</a>
+    <a href="{{ url_for('logout') }}" class="nav-logout">Logout</a>
+  </div>
+  {% else %}
+  <div class="nav-links">
+    <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('register') }}">Register</a>
+  </div>
+  {% endif %}
+</nav>
+
+<main>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flashes">
+      {% for cat, msg in messages %}
+      <div class="flash {{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<footer>Somnia &mdash; Dream Analyzer &nbsp;·&nbsp; Built with Flask &amp; Supabase</footer>
+</body>
+</html>

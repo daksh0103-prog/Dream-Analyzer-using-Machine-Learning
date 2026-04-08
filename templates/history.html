@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block title %}History{% endblock %}
+{% block extra_head %}
+<style>
+  .streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(226,201,126,0.1);
+    border: 1px solid rgba(226,201,126,0.25);
+    color: var(--gold);
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+  }
+
+  .dream-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 0.85rem;
+    transition: border-color 0.2s, transform 0.2s;
+    animation: fadeUp 0.4s ease both;
+  }
+  .dream-item:hover {
+    border-color: rgba(167,139,250,0.35);
+    transform: translateY(-1px);
+  }
+
+  .dream-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .dream-date {
+    font-size: 0.75rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .dream-text {
+    font-family: var(--font-head);
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .dream-interpretation {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .dream-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .actions { display: flex; gap: 0.5rem; }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--muted);
+  }
+  .empty-state h3 {
+    font-family: var(--font-head);
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  /* Confirm delete modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(7,8,15,0.75);
+    backdrop-filter: blur(6px);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    max-width: 380px;
+    width: 90%;
+    text-align: center;
+  }
+  .modal-box h3 {
+    font-family: var(--font-head);
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+  .modal-box p { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+  .modal-actions { display: flex; gap: 0.75rem; justify-content: center; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="fade-up" style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+  <div>
+    <h1 class="page-heading" style="margin-bottom:0.25rem;">Dream <em>Journal</em></h1>
+    <p class="page-sub" style="margin-bottom:0;">{{ dreams|length }} dream{{ 's' if dreams|length != 1 }} recorded</p>
+  </div>
+  <div>
+    {% if streak > 0 %}
+    <div class="streak-badge">🔥 {{ streak }}-day streak</div>
+    {% endif %}
+  </div>
+</div>
+
+{% if dreams %}
+  {% for dream in dreams %}
+  <div class="dream-item" style="animation-delay:{{ loop.index0 * 0.06 }}s;">
+    <div class="dream-header">
+      <p class="dream-text">{{ dream.text }}</p>
+      <span class="dream-date">{{ dream.created_at.strftime('%b %d, %Y') if dream.created_at else '' }}</span>
+    </div>
+    {% if dream.interpretation %}
+    <p class="dream-interpretation">{{ dream.interpretation }}</p>
+    {% endif %}
+    <div class="dream-footer">
+      <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+        {% if dream.emotion_primary %}
+        <span class="emotion-badge emo-{{ dream.emotion_primary }}">{{ dream.emotion_primary }}</span>
+        {% endif %}
+        {% if dream.emotion_secondary and dream.emotion_secondary != dream.emotion_primary %}
+        <span class="emotion-badge emo-{{ dream.emotion_secondary }}" style="opacity:0.6;">{{ dream.emotion_secondary }}</span>
+        {% endif %}
+      </div>
+      <div class="actions">
+        <a href="{{ url_for('edit_dream', dream_id=dream.id) }}" class="btn btn-ghost btn-sm">Edit</a>
+        <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ dream.id }})">Delete</button>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="empty-state fade-up">
+    <div style="font-size:3rem; margin-bottom:1rem;">🌙</div>
+    <h3>No dreams yet</h3>
+    <p style="margin:0.5rem 0 1.5rem;">Your journal is empty. Analyze your first dream to begin.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">Analyze a Dream →</a>
+  </div>
+{% endif %}
+
+<!-- Delete modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <h3>Delete Dream?</h3>
+    <p>This will permanently remove this dream from your journal.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <form id="deleteForm" method="POST">
+        <button class="btn btn-danger" type="submit">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function confirmDelete(id) {
+    document.getElementById('deleteForm').action = '/delete/' + id;
+    document.getElementById('deleteModal').classList.add('active');
+  }
+  function closeModal() {
+    document.getElementById('deleteModal').classList.remove('active');
+  }
+  document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+</script>
+{% endblock %}

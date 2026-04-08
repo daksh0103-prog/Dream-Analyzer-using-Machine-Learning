@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+{% block extra_head %}
+<style>
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    text-align: center;
+  }
+  .stat-number {
+    font-family: var(--font-head);
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .personality-card {
+    background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(240,171,252,0.05));
+    border: 1px solid rgba(167,139,250,0.25);
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .personality-card::before {
+    content: '✦';
+    position: absolute;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 5rem;
+    color: rgba(167,139,250,0.06);
+    pointer-events: none;
+  }
+  .personality-title {
+    font-family: var(--font-head);
+    font-size: 1.8rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--accent2);
+    margin-bottom: 0.5rem;
+  }
+  .personality-desc {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+    max-width: 480px;
+  }
+
+  .emotion-bar-wrap {
+    margin-bottom: 0.75rem;
+  }
+  .emotion-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    margin-bottom: 0.3rem;
+    text-transform: capitalize;
+  }
+  .emotion-bar-track {
+    height: 8px;
+    background: var(--surface);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .emotion-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 1s ease;
+  }
+
+  .section-title {
+    font-family: var(--font-head);
+    font-size: 1.3rem;
+    font-weight: 300;
+    margin-bottom: 1rem;
+    color: var(--text);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="fade-up" style="margin-bottom:1.5rem;">
+  <h1 class="page-heading">Your Dream <em>Insights</em></h1>
+  <p class="page-sub">Patterns and personality from {{ total }} recorded dream{{ 's' if total != 1 }}.</p>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid fade-up fade-up-1">
+  <div class="stat-card">
+    <div class="stat-number">{{ total }}</div>
+    <div class="stat-label">Total Dreams</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number" style="color:var(--gold);">{{ streak }}</div>
+    <div class="stat-label">Day Streak 🔥</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number" style="color:var(--accent2);">{{ emotion_counts|length }}</div>
+    <div class="stat-label">Emotions Found</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number" style="color:var(--success);">
+      {{ dominant_emotion|capitalize if dominant_emotion else '—' }}
+    </div>
+    <div class="stat-label">Dominant Mood</div>
+  </div>
+</div>
+
+<!-- Personality -->
+{% if total > 0 %}
+<div class="personality-card fade-up fade-up-2">
+  <p style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:0.4rem;">Your Dream Personality</p>
+  <div class="personality-title">{{ personality_title }}</div>
+  <p class="personality-desc">{{ personality_desc }}</p>
+</div>
+{% endif %}
+
+<!-- Emotion breakdown -->
+{% if emotion_counts %}
+<div class="card fade-up fade-up-3">
+  <h2 class="section-title">Emotion Breakdown</h2>
+  {% set max_count = emotion_counts[0].count %}
+  {% for row in emotion_counts %}
+  <div class="emotion-bar-wrap">
+    <div class="emotion-bar-label">
+      <span class="emotion-badge emo-{{ row.emotion }}">{{ row.emotion }}</span>
+      <span style="color:var(--muted);">{{ row.count }} dream{{ 's' if row.count != 1 }}</span>
+    </div>
+    <div class="emotion-bar-track">
+      <div class="emotion-bar-fill" style="width:{{ ((row.count / max_count) * 100)|int }}%;"></div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if total == 0 %}
+<div style="text-align:center; padding:3rem; color:var(--muted);">
+  <div style="font-size:3rem; margin-bottom:1rem;">📊</div>
+  <p>Analyze some dreams first to see your insights.</p>
+  <a href="{{ url_for('index') }}" class="btn btn-primary" style="margin-top:1rem;">Analyze a Dream →</a>
+</div>
+{% endif %}
+{% endblock %}
