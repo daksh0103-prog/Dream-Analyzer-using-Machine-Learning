@@ -90,17 +90,18 @@
   }
   .star-rating { display: flex; gap: 0.35rem; margin-bottom: 1rem; }
   .star-rating input[type="radio"] { display: none; }
-  .star-rating label {
+  .star-btn {
     font-size: 1.5rem;
     cursor: pointer;
-    color: var(--surface);
-    filter: brightness(3);
+    color: rgba(255,255,255,0.15);
     transition: transform 0.15s, color 0.15s;
+    background: none;
+    border: none;
+    padding: 0;
+    line-height: 1;
   }
-  .star-rating input:checked ~ label,
-  .star-rating label:hover,
-  .star-rating label:hover ~ label { color: var(--gold); }
-  .star-rating label:hover { transform: scale(1.2); }
+  .star-btn.active  { color: var(--gold); }
+  .star-btn:hover   { transform: scale(1.2); }
 
   /* Symbol tags */
   .symbol-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
@@ -143,16 +144,12 @@
     <div style="margin-bottom:1rem;">
       <span class="sleep-label">How did you sleep? <span style="color:var(--muted); font-size:0.72rem;">(optional)</span></span>
       <div class="star-rating" id="starRating">
-        <input type="radio" name="sleep_quality" id="s5" value="5">
-        <input type="radio" name="sleep_quality" id="s4" value="4">
-        <input type="radio" name="sleep_quality" id="s3" value="3">
-        <input type="radio" name="sleep_quality" id="s2" value="2">
-        <input type="radio" name="sleep_quality" id="s1" value="1">
-        <label for="s5">★</label>
-        <label for="s4">★</label>
-        <label for="s3">★</label>
-        <label for="s2">★</label>
-        <label for="s1">★</label>
+        <input type="hidden" name="sleep_quality" id="sleepQualityInput" value="">
+        <button type="button" class="star-btn" data-val="1">★</button>
+        <button type="button" class="star-btn" data-val="2">★</button>
+        <button type="button" class="star-btn" data-val="3">★</button>
+        <button type="button" class="star-btn" data-val="4">★</button>
+        <button type="button" class="star-btn" data-val="5">★</button>
       </div>
     </div>
 
@@ -232,6 +229,34 @@
 
   form.addEventListener('submit', () => {
     if (textarea.value.trim()) overlay.classList.add('active');
+  });
+
+  // ── Star rating ──────────────────────────────────────────────────────────
+  const starBtns   = document.querySelectorAll('.star-btn');
+  const sleepInput = document.getElementById('sleepQualityInput');
+  let selectedStar = 0;
+
+  function renderStars(highlightUpTo) {
+    starBtns.forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.dataset.val) <= highlightUpTo);
+    });
+  }
+
+  starBtns.forEach(btn => {
+    btn.addEventListener('mouseenter', () => renderStars(parseInt(btn.dataset.val)));
+    btn.addEventListener('mouseleave', () => renderStars(selectedStar));
+    btn.addEventListener('click', () => {
+      const val = parseInt(btn.dataset.val);
+      // Click same star again = deselect
+      if (val === selectedStar) {
+        selectedStar = 0;
+        sleepInput.value = '';
+      } else {
+        selectedStar = val;
+        sleepInput.value = val;
+      }
+      renderStars(selectedStar);
+    });
   });
 </script>
 {% endblock %}
