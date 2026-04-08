@@ -80,6 +80,39 @@
     text-align: right;
     margin-top: 0.3rem;
   }
+
+  /* Sleep quality stars */
+  .sleep-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  .star-rating { display: flex; gap: 0.35rem; margin-bottom: 1rem; }
+  .star-rating input[type="radio"] { display: none; }
+  .star-rating label {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--surface);
+    filter: brightness(3);
+    transition: transform 0.15s, color 0.15s;
+  }
+  .star-rating input:checked ~ label,
+  .star-rating label:hover,
+  .star-rating label:hover ~ label { color: var(--gold); }
+  .star-rating label:hover { transform: scale(1.2); }
+
+  /* Symbol tags */
+  .symbol-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+  .symbol-tag {
+    background: rgba(167,139,250,0.1);
+    border: 1px solid rgba(167,139,250,0.25);
+    color: var(--accent);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    letter-spacing: 0.03em;
+  }
 </style>
 {% endblock %}
 
@@ -105,6 +138,24 @@
       <textarea name="dream" id="dreamText" placeholder="I was standing at the edge of a vast ocean, and the sky turned violet…" maxlength="1000">{% if result %}{{ result.text }}{% endif %}</textarea>
       <div class="char-counter"><span id="charCount">0</span> / 1000</div>
     </div>
+
+    <!-- Sleep quality rating -->
+    <div style="margin-bottom:1rem;">
+      <span class="sleep-label">How did you sleep? <span style="color:var(--muted); font-size:0.72rem;">(optional)</span></span>
+      <div class="star-rating" id="starRating">
+        <input type="radio" name="sleep_quality" id="s5" value="5">
+        <input type="radio" name="sleep_quality" id="s4" value="4">
+        <input type="radio" name="sleep_quality" id="s3" value="3">
+        <input type="radio" name="sleep_quality" id="s2" value="2">
+        <input type="radio" name="sleep_quality" id="s1" value="1">
+        <label for="s5">★</label>
+        <label for="s4">★</label>
+        <label for="s3">★</label>
+        <label for="s2">★</label>
+        <label for="s1">★</label>
+      </div>
+    </div>
+
     <button class="btn btn-primary" type="submit" id="submitBtn">
       ✦ Analyze Dream
     </button>
@@ -146,6 +197,21 @@
       </div>
 
       <hr style="margin:1rem 0;">
+      {% if result.symbols %}
+      <div style="margin-bottom:0.75rem;">
+        <p style="font-size:0.75rem; color:var(--muted); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.08em;">✦ Dream Symbols</p>
+        <div class="symbol-tags">
+          {% for sym in result.symbols %}
+          <span class="symbol-tag">{{ sym }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      {% if result.sleep_quality %}
+      <p style="font-size:0.8rem; color:var(--muted); margin-bottom:0.5rem;">
+        Sleep quality: <span style="color:var(--gold);">{{ '★' * result.sleep_quality }}{{ '☆' * (5 - result.sleep_quality) }}</span>
+      </p>
+      {% endif %}
       <p style="font-size:0.8rem; color:var(--muted);">Dream saved to your journal.</p>
       <a href="{{ url_for('history') }}" class="btn btn-ghost btn-sm" style="margin-top:0.5rem;">View History →</a>
     </div>
