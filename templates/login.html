@@ -33,8 +33,6 @@
         radial-gradient(1px 1px at 91% 88%,rgba(255,255,255,0.5)  0%,transparent 100%),
         radial-gradient(1px 1px at 14% 78%,rgba(255,255,255,0.4)  0%,transparent 100%),
         radial-gradient(1px 1px at 76% 15%,rgba(255,255,255,0.5)  0%,transparent 100%),
-        radial-gradient(1px 1px at 5%  55%,rgba(255,255,255,0.3)  0%,transparent 100%),
-        radial-gradient(1px 1px at 95% 45%,rgba(255,255,255,0.4)  0%,transparent 100%),
         radial-gradient(2px 2px at 33% 52%,rgba(167,139,250,0.45) 0%,transparent 100%),
         radial-gradient(2px 2px at 73% 32%,rgba(240,171,252,0.35) 0%,transparent 100%),
         radial-gradient(2px 2px at 55% 65%,rgba(167,139,250,0.25) 0%,transparent 100%);
@@ -44,26 +42,19 @@
       width:600px;height:400px;pointer-events:none;z-index:0;
       background:radial-gradient(ellipse,rgba(167,139,250,0.08) 0%,transparent 70%);
     }
-    /* Hero */
     .hero{position:relative;z-index:1;text-align:center;padding:3.5rem 1.5rem 2rem;}
-    .hero-title{
-      font-family:var(--font-head);font-size:clamp(3rem,9vw,5.5rem);
-      font-weight:300;line-height:1.1;color:var(--text);
-    }
+    .hero-title{font-family:var(--font-head);font-size:clamp(3rem,9vw,5.5rem);font-weight:300;line-height:1.1;color:var(--text);}
     .hero-title em{display:block;font-style:italic;color:var(--accent);font-weight:300;}
     .hero-sub{margin-top:1rem;font-size:0.72rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);}
-    /* Card */
     .login-card{position:relative;z-index:1;width:100%;max-width:380px;padding:0 1.5rem;}
     .card-inner{
       background:rgba(17,20,38,0.75);border:1px solid var(--border);
       border-radius:18px;padding:2rem 2rem 1.75rem;backdrop-filter:blur(20px);
     }
-    /* Flashes */
     .flashes{margin-bottom:1.25rem;display:flex;flex-direction:column;gap:0.5rem;}
     .flash{padding:0.65rem 1rem;border-radius:10px;font-size:0.82rem;border-left:3px solid;}
     .flash.error  {background:rgba(248,113,113,0.1); border-color:var(--danger); color:#fca5a5;}
     .flash.success{background:rgba(110,231,183,0.1); border-color:var(--success);color:#6ee7b7;}
-    /* Fields */
     .field{margin-bottom:1.4rem;}
     .field-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;}
     label{font-size:0.68rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);font-weight:500;}
@@ -75,7 +66,6 @@
     }
     input::placeholder{color:rgba(123,122,142,0.5);}
     input:focus{border-bottom-color:var(--accent);}
-    /* Button */
     .btn-submit{
       width:100%;margin-top:1.75rem;padding:0.9rem;background:var(--accent);
       color:#07080f;border:none;border-radius:12px;font-family:var(--font-body);
@@ -83,34 +73,39 @@
       cursor:pointer;transition:background 0.2s,transform 0.15s;
     }
     .btn-submit:hover{background:#c4b5fd;transform:translateY(-1px);}
-    /* Divider */
     .divider{
       display:flex;align-items:center;gap:0.75rem;margin:1.5rem 0 1.25rem;
       color:var(--muted);font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;
     }
     .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
-    /* Socials */
-    .socials{display:flex;justify-content:center;gap:1.5rem;}
-    .social-btn{display:flex;flex-direction:column;align-items:center;gap:0.45rem;cursor:pointer;}
-    .social-icon{
-      width:44px;height:44px;border:1px solid var(--border);border-radius:12px;
-      background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;
-      transition:border-color 0.2s,background 0.2s;
+    /* OAuth buttons */
+    .oauth-btns{display:flex;flex-direction:column;gap:0.65rem;}
+    .oauth-btn{
+      display:flex;align-items:center;gap:0.85rem;
+      width:100%;padding:0.72rem 1rem;
+      background:rgba(255,255,255,0.04);
+      border:1px solid var(--border);
+      border-radius:12px;
+      color:var(--text);
+      font-family:var(--font-body);
+      font-size:0.82rem;
+      font-weight:400;
+      letter-spacing:0.04em;
+      cursor:pointer;
+      text-decoration:none;
+      transition:background 0.2s,border-color 0.2s,transform 0.15s;
     }
-    .social-btn:hover .social-icon{border-color:rgba(167,139,250,0.4);background:rgba(167,139,250,0.07);}
-    .social-icon svg{width:18px;height:18px;fill:var(--muted);}
-    .social-label{font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);}
-    /* Register link */
+    .oauth-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(167,139,250,0.35);transform:translateY(-1px);}
+    .oauth-icon{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+    .oauth-icon svg{width:20px;height:20px;}
     .register-link{text-align:center;margin-top:1.75rem;font-size:0.78rem;letter-spacing:0.05em;color:var(--muted);}
     .register-link a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;transition:color 0.2s;}
     .register-link a:hover{color:var(--accent2);}
-    /* Footer */
     footer{position:relative;z-index:1;width:100%;text-align:center;padding:2rem 1.5rem 1.5rem;}
     .footer-copy{font-family:var(--font-head);font-style:italic;font-size:0.85rem;color:var(--muted);margin-bottom:0.75rem;}
     .footer-links{display:flex;justify-content:center;gap:2rem;}
     .footer-links a{font-size:0.65rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s;}
     .footer-links a:hover{color:var(--text);}
-    /* Animations */
     @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
     .hero      {animation:fadeUp 0.6s ease both;}
     .login-card{animation:fadeUp 0.6s ease 0.12s both;}
@@ -144,38 +139,39 @@
           </div>
           <input type="text" id="username" name="username" placeholder="dreamer" autocomplete="username" required>
         </div>
-
         <div class="field">
           <div class="field-header">
             <label for="password">The Sigil (Password)</label>
           </div>
           <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
         </div>
-
         <button class="btn-submit" type="submit">Enter the Dream</button>
       </form>
 
       <div class="divider">or manifest via</div>
 
-      <div class="socials">
-        <div class="social-btn" title="Google (coming soon)">
-          <div class="social-icon">
-            <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-          </div>
-          <span class="social-label">Oracle</span>
-        </div>
-        <div class="social-btn" title="GitHub (coming soon)">
-          <div class="social-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-          </div>
-          <span class="social-label">Ether</span>
-        </div>
-        <div class="social-btn" title="Discord (coming soon)">
-          <div class="social-icon">
-            <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.054a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-          </div>
-          <span class="social-label">Essence</span>
-        </div>
+      <div class="oauth-btns">
+        <!-- Google OAuth -->
+        <a href="{{ url_for('oauth_google') }}" class="oauth-btn">
+          <span class="oauth-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+          </span>
+          Continue with Google
+        </a>
+        <!-- GitHub OAuth -->
+        <a href="{{ url_for('oauth_github') }}" class="oauth-btn">
+          <span class="oauth-icon">
+            <svg viewBox="0 0 24 24" fill="var(--text)" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+          </span>
+          Continue with GitHub
+        </a>
       </div>
 
     </div>
