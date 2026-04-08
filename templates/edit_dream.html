@@ -15,6 +15,17 @@
         <textarea name="dream" required maxlength="1000">{{ dream.text }}</textarea>
       </div>
 
+      <div style="margin-bottom:1.25rem;">
+        <label style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.5rem;">How did you sleep? <span style="font-size:0.72rem;">(optional)</span></label>
+        <div style="display:flex;gap:0.35rem;">
+          {% for i in [5,4,3,2,1] %}
+          <label style="font-size:1.5rem;cursor:pointer;color:{% if dream.sleep_quality and dream.sleep_quality >= i %}var(--gold){% else %}rgba(255,255,255,0.1){% endif %};">
+            <input type="radio" name="sleep_quality" value="{{ i }}" style="display:none;" {% if dream.sleep_quality == i %}checked{% endif %}>★
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
       {% if dream.interpretation %}
       <div style="background:var(--surface); border-radius:10px; padding:1rem; margin-bottom:1.25rem;">
         <p style="font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:0.4rem;">Previous Interpretation</p>
