@@ -73,3 +73,42 @@ class DreamAI:
         except Exception as e:
             print("Emotion error:", e)
             return fallback
+
+    def extract_symbols(self, dream_text: str) -> list:
+        """Extract recurring dream symbols/themes as a list of short labels."""
+        try:
+            res = requests.post(
+                self.HF_CHAT_URL,
+                headers=self.headers,
+                json={
+                    "model": "Qwen/Qwen2.5-7B-Instruct",
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": (
+                                "You are a dream symbol extractor. "
+                                "Given a dream description, return ONLY a JSON array of "
+                                "3-6 short symbol labels (1-3 words each) representing the key "
+                                "archetypes or themes present (e.g. \"water\", \"falling\", "
+                                "\"unknown figure\", \"flying\", \"dark forest\"). "
+                                "No explanation, no markdown, just the raw JSON array."
+                            )
+                        },
+                        {"role": "user", "content": dream_text}
+                    ],
+                    "max_tokens": 80,
+                    "temperature": 0.3
+                },
+                timeout=60,
+            )
+            res.raise_for_status()
+            raw = res.json()["choices"][0]["message"]["content"].strip()
+            # Strip any accidental markdown fences
+            raw = raw.replace("```json", "").replace("```", "").strip()
+            import json
+            symbols = json.loads(raw)
+            if isinstance(symbols, list):
+                return [str(s).strip().lower() for s in symbols if s][:6]
+        except Exception as e:
+            print("Symbol extraction error:", e)
+        return []
