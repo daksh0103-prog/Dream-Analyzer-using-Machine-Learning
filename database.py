@@ -45,6 +45,11 @@ def init_db():
             cur.execute("""
                 ALTER TABLE dreams ADD COLUMN IF NOT EXISTS sleep_quality INTEGER DEFAULT NULL;
             """)
+            # Migrate: add OAuth columns to users if not present
+            cur.execute("""
+                ALTER TABLE users ADD COLUMN IF NOT EXISTS oauth_id TEXT UNIQUE DEFAULT NULL;
+                ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT DEFAULT NULL;
+            """)
         conn.commit()
 
 
@@ -59,6 +64,48 @@ def create_user(username, password):
                 (username, hashed)
             )
         conn.commit()
+
+
+def get_or_create_oauth_user(oauth_id: str, username: str, email: str):
+    """Find existing user by oauth_id, or create a new one (no password)."""
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            # 1. Try matching by oauth_id
+            cur.execute("SELECT * FROM users WHERE oauth_id = %s", (oauth_id,))
+            user = cur.fetchone()
+            if user:
+                return user
+
+            # 2. Try matching by email (user may have registered manually before)
+            if email:
+                cur.execute("SELECT * FROM users WHERE email = %s", (email,))
+                user = cur.fetchone()
+                if user:
+                    # Attach oauth_id to existing account
+                    cur.execute(
+                        "UPDATE users SET oauth_id = %s WHERE id = %s",
+                        (oauth_id, user["id"])
+                    )
+                    conn.commit()
+                    cur.execute("SELECT * FROM users WHERE id = %s", (user["id"],))
+                    return cur.fetchone()
+
+            # 3. Create new OAuth user — ensure unique username
+            base = username
+            suffix = 0
+            while True:
+                candidate = base if suffix == 0 else f"{base}{suffix}"
+                cur.execute("SELECT id FROM users WHERE username = %s", (candidate,))
+                if not cur.fetchone():
+                    break
+                suffix += 1
+            cur.execute(
+                "INSERT INTO users (username, password, oauth_id, email) VALUES (%s, %s, %s, %s) RETURNING *",
+                (candidate, "", oauth_id, email)
+            )
+            new_user = cur.fetchone()
+        conn.commit()
+    return new_user
 
 
 def get_user(username):
