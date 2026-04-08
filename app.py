@@ -87,6 +87,12 @@ def index():
 
         interpretation = ai.interpret(dream_text)
         emotion = ai.analyze_emotion(dream_text)
+        symbols = ai.extract_symbols(dream_text)
+
+        try:
+            sleep_quality = int(request.form.get("sleep_quality", 0)) or None
+        except (ValueError, TypeError):
+            sleep_quality = None
 
         dream_id = db.save_dream(
             user_id=session["user_id"],
@@ -96,12 +102,16 @@ def index():
             emotion_secondary=emotion["secondary"],
             confidence_primary=emotion["confidence_primary"],
             confidence_secondary=emotion["confidence_secondary"],
+            sleep_quality=sleep_quality,
+            symbols=symbols,
         )
         result = {
             "id": dream_id,
             "text": dream_text,
             "interpretation": interpretation,
             "emotion": emotion,
+            "symbols": symbols,
+            "sleep_quality": sleep_quality,
         }
     return render_template("index.html", result=result)
 
@@ -130,10 +140,16 @@ def edit_dream(dream_id):
 
         interpretation = ai.interpret(text)
         emotion = ai.analyze_emotion(text)
+        symbols = ai.extract_symbols(text)
+        try:
+            sleep_quality = int(request.form.get("sleep_quality", 0)) or None
+        except (ValueError, TypeError):
+            sleep_quality = None
         db.update_dream(
             dream_id, session["user_id"], text, interpretation,
             emotion["primary"], emotion["secondary"],
             emotion["confidence_primary"], emotion["confidence_secondary"],
+            sleep_quality=sleep_quality, symbols=symbols,
         )
         flash("Dream updated!", "success")
         return redirect(url_for("history"))
@@ -155,6 +171,9 @@ def analytics():
     dreams = db.get_dreams(session["user_id"])
     emotion_counts = db.get_emotion_counts(session["user_id"])
     streak = db.get_streak(session["user_id"])
+    mood_calendar = db.get_mood_calendar(session["user_id"])
+    sleep_data = db.get_sleep_emotion_data(session["user_id"])
+    top_symbols = db.get_top_symbols(session["user_id"])
     total = len(dreams)
 
     # Personality insight based on dominant emotion
@@ -172,6 +191,19 @@ def analytics():
         dominant, personality_map["neutral"]
     )
 
+    # Sleep-emotion correlation: avg sleep per emotion
+    sleep_by_emotion = {}
+    for row in sleep_data:
+        e = row["emotion_primary"] or "neutral"
+        sleep_by_emotion.setdefault(e, []).append(row["sleep_quality"])
+    sleep_emotion_avg = {
+        e: round(sum(v) / len(v), 1)
+        for e, v in sleep_by_emotion.items()
+    }
+
+    # Mood calendar: convert to {date_str: emotion}
+    mood_map = {str(r["day"]): r["emotion"] for r in mood_calendar}
+
     return render_template(
         "analytics.html",
         dreams=dreams,
@@ -181,6 +213,10 @@ def analytics():
         personality_title=personality_title,
         personality_desc=personality_desc,
         dominant_emotion=dominant,
+        mood_map=mood_map,
+        sleep_data=[dict(r) for r in sleep_data],
+        sleep_emotion_avg=sleep_emotion_avg,
+        top_symbols=top_symbols,
     )
 
 
