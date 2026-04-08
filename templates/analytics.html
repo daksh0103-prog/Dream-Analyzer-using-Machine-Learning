@@ -94,6 +94,40 @@
     margin-bottom: 1rem;
     color: var(--text);
   }
+
+  /* Recurring symbols cloud */
+  .symbol-pill {
+    background: rgba(167,139,250,0.08);
+    border: 1px solid rgba(167,139,250,0.2);
+    color: var(--accent);
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    font-family: var(--font-body);
+    font-weight: 400;
+    transition: background 0.2s, transform 0.15s;
+    cursor: default;
+  }
+  .symbol-pill:hover {
+    background: rgba(167,139,250,0.18);
+    transform: scale(1.05);
+  }
+  .sym-count {
+    font-size: 0.7em;
+    color: var(--muted);
+    margin-left: 0.3em;
+  }
+
+  /* Symbol tags (also used in index) */
+  .symbol-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+  .symbol-tag {
+    background: rgba(167,139,250,0.1);
+    border: 1px solid rgba(167,139,250,0.25);
+    color: var(--accent);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    letter-spacing: 0.03em;
+  }
 </style>
 {% endblock %}
 
@@ -153,6 +187,58 @@
 </div>
 {% endif %}
 
+<!-- ── Mood Calendar ─────────────────────────────────────────────────────── -->
+{% if mood_map %}
+<div class="card fade-up fade-up-4" style="margin-bottom:1.5rem;">
+  <h2 class="section-title">Dream Mood Calendar <span style="font-size:0.75rem;color:var(--muted);font-family:var(--font-body);font-weight:300;"> — last 90 days</span></h2>
+  <div id="moodCalendar" style="overflow-x:auto;"></div>
+  <div style="display:flex;gap:1.25rem;flex-wrap:wrap;margin-top:1rem;">
+    {% for emo,col in [('joy','#6ee7b7'),('sadness','#93c5fd'),('fear','#c4b5fd'),('anger','#fca5a5'),('surprise','#fde68a'),('neutral','#6b7280')] %}
+    <span style="font-size:0.72rem;color:var(--muted);display:flex;align-items:center;gap:0.3rem;">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:{{ col }};"></span>{{ emo }}
+    </span>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- ── Recurring Symbols ──────────────────────────────────────────────────── -->
+{% if top_symbols %}
+<div class="card fade-up fade-up-5" style="margin-bottom:1.5rem;">
+  <h2 class="section-title">Recurring Dream Symbols</h2>
+  <div id="symbolCloud" style="display:flex;flex-wrap:wrap;gap:0.6rem;align-items:center;padding:0.5rem 0;">
+    {% set max_sym = top_symbols[0].count %}
+    {% for sym in top_symbols %}
+    {% set size = 0.75 + ((sym.count / max_sym) * 1.1) %}
+    <span class="symbol-pill" style="font-size:{{ size }}rem; opacity:{{ 0.55 + (sym.count / max_sym) * 0.45 }};">
+      {{ sym.symbol }}
+      <span class="sym-count">×{{ sym.count }}</span>
+    </span>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- ── Sleep Quality Correlation ─────────────────────────────────────────── -->
+{% if sleep_emotion_avg %}
+<div class="card fade-up fade-up-6" style="margin-bottom:1.5rem;">
+  <h2 class="section-title">Sleep Quality by Emotion</h2>
+  <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem;">Average sleep rating (★) on nights you dreamt each emotion.</p>
+  {% for emo, avg in sleep_emotion_avg.items()|sort(attribute='1', reverse=True) %}
+  <div style="margin-bottom:0.75rem;">
+    <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem;">
+      <span class="emotion-badge emo-{{ emo }}">{{ emo }}</span>
+      <span style="color:var(--gold);">{{ '%.1f'|format(avg) }} ★</span>
+    </div>
+    <div class="emotion-bar-track">
+      <div class="emotion-bar-fill" style="width:{{ ((avg / 5) * 100)|int }}%; background:linear-gradient(90deg,var(--gold),#f59e0b);"></div>
+    </div>
+  </div>
+  {% endfor %}
+  <p style="font-size:0.72rem;color:var(--muted);margin-top:0.75rem;">Based on {{ sleep_data|length }} dream{{ 's' if sleep_data|length != 1 }} with sleep ratings.</p>
+</div>
+{% endif %}
+
 {% if total == 0 %}
 <div style="text-align:center; padding:3rem; color:var(--muted);">
   <div style="font-size:3rem; margin-bottom:1rem;">📊</div>
@@ -160,4 +246,68 @@
   <a href="{{ url_for('index') }}" class="btn btn-primary" style="margin-top:1rem;">Analyze a Dream →</a>
 </div>
 {% endif %}
+
+<script>
+// ── Mood Calendar renderer ─────────────────────────────────────────────────
+(function() {
+  const moodMap = {{ mood_map | tojson }};
+  const emotionColors = {
+    joy:      '#6ee7b7', sadness: '#93c5fd', fear:    '#c4b5fd',
+    anger:    '#fca5a5', surprise:'#fde68a', disgust: '#d1d5db',
+    neutral:  '#6b7280', admiration:'#a5f3fc', amusement:'#fbcfe8',
+  };
+  const container = document.getElementById('moodCalendar');
+  if (!container) return;
+
+  const today = new Date();
+  const startDate = new Date(today);
+  startDate.setDate(today.getDate() - 89);
+
+  // Build week columns
+  const weeks = [];
+  let week = [];
+  let d = new Date(startDate);
+  // Pad first week
+  for (let i = 0; i < d.getDay(); i++) week.push(null);
+  while (d <= today) {
+    week.push(new Date(d));
+    if (d.getDay() === 6) { weeks.push(week); week = []; }
+    d.setDate(d.getDate() + 1);
+  }
+  if (week.length) { while(week.length < 7) week.push(null); weeks.push(week); }
+
+  const dayLabels = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const CELL = 14, GAP = 3;
+
+  let html = `<div style="display:flex;gap:${GAP}px;align-items:flex-start;min-width:fit-content;">`;
+  // Day labels column
+  html += `<div style="display:flex;flex-direction:column;gap:${GAP}px;padding-top:20px;">`;
+  for (let i = 0; i < 7; i++) {
+    html += `<div style="width:18px;height:${CELL}px;font-size:9px;color:var(--muted);line-height:${CELL}px;text-align:right;">${i%2===1?dayLabels[i]:''}</div>`;
+  }
+  html += '</div>';
+
+  weeks.forEach((wk, wi) => {
+    html += `<div style="display:flex;flex-direction:column;gap:${GAP}px;">`;
+    // Month label on first day of month
+    const firstReal = wk.find(Boolean);
+    const showMonth = firstReal && (firstReal.getDate() <= 7 || wi === 0);
+    html += `<div style="height:16px;font-size:9px;color:var(--muted);white-space:nowrap;">${showMonth ? firstReal.toLocaleString('default',{month:'short'}) : ''}</div>`;
+    wk.forEach(day => {
+      if (!day) {
+        html += `<div style="width:${CELL}px;height:${CELL}px;"></div>`;
+        return;
+      }
+      const key = day.toISOString().slice(0,10);
+      const emo = moodMap[key];
+      const color = emo ? (emotionColors[emo] || '#a78bfa') : 'rgba(255,255,255,0.05)';
+      const title = emo ? `${key}: ${emo}` : key;
+      html += `<div title="${title}" style="width:${CELL}px;height:${CELL}px;border-radius:3px;background:${color};cursor:default;transition:transform 0.15s;" onmouseover="this.style.transform='scale(1.4)'" onmouseout="this.style.transform='scale(1)'"></div>`;
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+})();
+</script>
 {% endblock %}
