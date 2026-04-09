@@ -35,6 +35,20 @@ def login_required(f):
     return decorated
 
 
+def admin_required(f):
+    from functools import wraps
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect(url_for("login"))
+        user = db.get_user_by_id(session["user_id"])
+        if not user or not user.get("is_admin"):
+            flash("Access denied. Admins only.", "error")
+            return redirect(url_for("index"))
+        return f(*args, **kwargs)
+    return decorated
+
+
 # ── Auth routes ────────────────────────────────────────────────────────────────
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -63,8 +77,12 @@ def login():
         password = request.form["password"].strip()
         user = db.verify_password(username, password)
         if user:
+            if user.get("is_blocked"):
+                flash("Your account has been suspended. Contact support.", "error")
+                return redirect(url_for("login"))
             session["user_id"] = user["id"]
             session["username"] = user["username"]
+            session["is_admin"] = bool(user.get("is_admin"))
             return redirect(url_for("index"))
         flash("Invalid username or password.", "error")
     return render_template("login.html")
@@ -293,8 +311,12 @@ def oauth_google_callback():
     oauth_id = f"google:{profile.get('id')}"
 
     user = db.get_or_create_oauth_user(oauth_id=oauth_id, username=name, email=email)
+    if user.get("is_blocked"):
+        flash("Your account has been suspended. Contact support.", "error")
+        return redirect(url_for("login"))
     session["user_id"]  = user["id"]
     session["username"] = user["username"]
+    session["is_admin"] = bool(user.get("is_admin"))
     return redirect(url_for("index"))
 
 
@@ -365,9 +387,126 @@ def oauth_github_callback():
     oauth_id = f"github:{profile.get('id')}"
 
     user = db.get_or_create_oauth_user(oauth_id=oauth_id, username=username, email=email)
+    if user.get("is_blocked"):
+        flash("Your account has been suspended. Contact support.", "error")
+        return redirect(url_for("login"))
     session["user_id"]  = user["id"]
     session["username"] = user["username"]
+    session["is_admin"] = bool(user.get("is_admin"))
     return redirect(url_for("index"))
+
+
+# ── Admin Routes ───────────────────────────────────────────────────────────────
+
+@app.route("/admin/setup")
+def admin_setup():
+    """One-time route: promote ADMIN_USERNAME from .env to admin. Disable after use."""
+    admin_username = os.getenv("ADMIN_USERNAME", "")
+    if not admin_username:
+        return "Set ADMIN_USERNAME in .env first.", 400
+    user = db.get_user(admin_username)
+    if not user:
+        return f"User '{admin_username}' not found. Register first.", 404
+    db.set_user_admin(user["id"], True)
+    return f"✅ '{admin_username}' is now an admin. Remove ADMIN_USERNAME from .env after this.", 200
+
+
+@app.route("/admin")
+@admin_required
+def admin_panel():
+    stats   = db.get_admin_stats()
+    users   = db.get_all_users()
+    dreams  = db.get_all_dreams_admin(limit=50)
+    return render_template("admin.html", stats=stats, users=users, dreams=dreams,
+                           active_tab="overview")
+
+
+@app.route("/admin/users")
+@admin_required
+def admin_users():
+    stats = db.get_admin_stats()
+    users = db.get_all_users()
+    return render_template("admin.html", stats=stats, users=users, dreams=[],
+                           active_tab="users")
+
+
+@app.route("/admin/dreams")
+@admin_required
+def admin_dreams():
+    stats  = db.get_admin_stats()
+    users  = db.get_all_users()
+    dreams = db.get_all_dreams_admin(limit=200)
+    return render_template("admin.html", stats=stats, users=users, dreams=dreams,
+                           active_tab="dreams")
+
+
+@app.route("/admin/user/<int:user_id>/dreams")
+@admin_required
+def admin_user_dreams(user_id):
+    stats  = db.get_admin_stats()
+    users  = db.get_all_users()
+    dreams = db.get_user_dreams_admin(user_id)
+    target = db.get_user_by_id(user_id)
+    return render_template("admin.html", stats=stats, users=users, dreams=dreams,
+                           active_tab="dreams", filter_user=target)
+
+
+@app.route("/admin/dream/<int:dream_id>/delete", methods=["POST"])
+@admin_required
+def admin_delete_dream(dream_id):
+    db.admin_delete_dream(dream_id)
+    flash("Dream deleted.", "success")
+    next_url = request.form.get("next") or url_for("admin_dreams")
+    return redirect(next_url)
+
+
+@app.route("/admin/user/<int:user_id>/block", methods=["POST"])
+@admin_required
+def admin_block_user(user_id):
+    if user_id == session["user_id"]:
+        flash("You cannot block yourself.", "error")
+        return redirect(url_for("admin_users"))
+    db.set_user_blocked(user_id, True)
+    flash("User blocked.", "success")
+    return redirect(url_for("admin_users"))
+
+
+@app.route("/admin/user/<int:user_id>/unblock", methods=["POST"])
+@admin_required
+def admin_unblock_user(user_id):
+    db.set_user_blocked(user_id, False)
+    flash("User unblocked.", "success")
+    return redirect(url_for("admin_users"))
+
+
+@app.route("/admin/user/<int:user_id>/delete", methods=["POST"])
+@admin_required
+def admin_delete_user(user_id):
+    if user_id == session["user_id"]:
+        flash("You cannot delete yourself.", "error")
+        return redirect(url_for("admin_users"))
+    db.admin_delete_user(user_id)
+    flash("User and all their data deleted.", "success")
+    return redirect(url_for("admin_users"))
+
+
+@app.route("/admin/user/<int:user_id>/make-admin", methods=["POST"])
+@admin_required
+def admin_make_admin(user_id):
+    db.set_user_admin(user_id, True)
+    flash("User promoted to admin.", "success")
+    return redirect(url_for("admin_users"))
+
+
+@app.route("/admin/user/<int:user_id>/remove-admin", methods=["POST"])
+@admin_required
+def admin_remove_admin(user_id):
+    if user_id == session["user_id"]:
+        flash("You cannot remove your own admin rights.", "error")
+        return redirect(url_for("admin_users"))
+    db.set_user_admin(user_id, False)
+    flash("Admin rights removed.", "success")
+    return redirect(url_for("admin_users"))
 
 
 # ── Error handlers ─────────────────────────────────────────────────────────────
