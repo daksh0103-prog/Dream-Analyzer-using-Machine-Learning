@@ -50,6 +50,11 @@ def init_db():
                 ALTER TABLE users ADD COLUMN IF NOT EXISTS oauth_id TEXT UNIQUE DEFAULT NULL;
                 ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT DEFAULT NULL;
             """)
+            # Migrate: add admin and blocked columns
+            cur.execute("""
+                ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
+                ALTER TABLE users ADD COLUMN IF NOT EXISTS is_blocked BOOLEAN DEFAULT FALSE;
+            """)
         conn.commit()
 
 
@@ -292,3 +297,96 @@ def get_top_symbols(user_id, limit=20):
                 LIMIT %s
             """, (user_id, limit))
             return cur.fetchall()
+
+
+# ── Admin ──────────────────────────────────────────────────────────────────────
+
+def get_all_users():
+    """Return all users with dream count, ordered by join date."""
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("""
+                SELECT u.id, u.username, u.email, u.created_at,
+                       u.is_admin, u.is_blocked, u.oauth_id,
+                       COUNT(d.id) AS dream_count
+                FROM users u
+                LEFT JOIN dreams d ON d.user_id = u.id
+                GROUP BY u.id
+                ORDER BY u.created_at DESC
+            """)
+            return cur.fetchall()
+
+
+def get_all_dreams_admin(limit=200):
+    """Return all dreams across all users for admin view."""
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("""
+                SELECT d.*, u.username
+                FROM dreams d
+                JOIN users u ON u.id = d.user_id
+                ORDER BY d.created_at DESC
+                LIMIT %s
+            """, (limit,))
+            return cur.fetchall()
+
+
+def get_user_dreams_admin(user_id):
+    """Return all dreams for a specific user (admin use)."""
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("""
+                SELECT d.*, u.username
+                FROM dreams d
+                JOIN users u ON u.id = d.user_id
+                WHERE d.user_id = %s
+                ORDER BY d.created_at DESC
+            """, (user_id,))
+            return cur.fetchall()
+
+
+def admin_delete_dream(dream_id):
+    """Delete any dream (admin, no user_id check)."""
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM dreams WHERE id=%s", (dream_id,))
+        conn.commit()
+
+
+def admin_delete_user(user_id):
+    """Delete a user and all their data (cascade)."""
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM users WHERE id=%s", (user_id,))
+        conn.commit()
+
+
+def set_user_blocked(user_id, blocked: bool):
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("UPDATE users SET is_blocked=%s WHERE id=%s", (blocked, user_id))
+        conn.commit()
+
+
+def set_user_admin(user_id, is_admin: bool):
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("UPDATE users SET is_admin=%s WHERE id=%s", (is_admin, user_id))
+        conn.commit()
+
+
+def get_admin_stats():
+    """Global stats for admin dashboard."""
+    with get_conn() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("""
+                SELECT
+                    (SELECT COUNT(*) FROM users) AS total_users,
+                    (SELECT COUNT(*) FROM users WHERE is_blocked=TRUE) AS blocked_users,
+                    (SELECT COUNT(*) FROM dreams) AS total_dreams,
+                    (SELECT COUNT(*) FROM dreams
+                     WHERE created_at >= NOW() - INTERVAL '24 hours') AS dreams_today,
+                    (SELECT COUNT(*) FROM users
+                     WHERE created_at >= NOW() - INTERVAL '7 days') AS new_users_week
+            """)
+            return cur.fetchone()
