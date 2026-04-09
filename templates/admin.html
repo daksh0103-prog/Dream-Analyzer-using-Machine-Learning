@@ -5,54 +5,102 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Panel · Somnia</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    /* ═══════════════════════════════════════════════════
+       ADMIN — completely different from the dream UI
+       Dark red/charcoal theme, monospace, grid-heavy
+    ═══════════════════════════════════════════════════ */
     :root{
-      --bg:#07080f;--surface:#0d0f1e;--card:#111428;--border:rgba(120,110,200,0.15);
-      --border2:rgba(120,110,200,0.28);--accent:#a78bfa;--accent2:#f0abfc;--gold:#e2c97e;
-      --text:#e8e6f0;--muted:#7b7a8e;--danger:#f87171;--success:#6ee7b7;--warn:#fbbf24;
-      --sidebar:220px;--topbar:54px;
-      --font-head:'Cormorant Garamond',serif;--font-body:'DM Sans',sans-serif;--radius:12px;
+      --bg:      #0a0a0a;
+      --surface: #111111;
+      --card:    #161616;
+      --card2:   #1c1c1c;
+      --border:  rgba(220,38,38,0.18);
+      --border2: rgba(220,38,38,0.35);
+      --red:     #ef4444;
+      --red-dim: #7f1d1d;
+      --orange:  #f97316;
+      --green:   #22c55e;
+      --yellow:  #eab308;
+      --blue:    #3b82f6;
+      --text:    #e5e5e5;
+      --text2:   #a3a3a3;
+      --muted:   #525252;
+      --sidebar: 230px;
+      --topbar:  52px;
+      --mono:    'JetBrains Mono', monospace;
+      --sans:    'Inter', sans-serif;
+      --radius:  6px;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     html,body{height:100%;overflow:hidden;}
-    body{font-family:var(--font-body);background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
+    body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
 
-    /* starfield */
-    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    /* Grid pattern background — very different from starfield */
+    body::before{
+      content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       background-image:
-        radial-gradient(1px 1px at 10% 15%,rgba(255,255,255,0.4) 0%,transparent 100%),
-        radial-gradient(1px 1px at 80% 20%,rgba(255,255,255,0.3) 0%,transparent 100%),
-        radial-gradient(1px 1px at 50% 70%,rgba(167,139,250,0.25) 0%,transparent 100%),
-        radial-gradient(1px 1px at 30% 90%,rgba(255,255,255,0.2) 0%,transparent 100%);}
+        linear-gradient(rgba(220,38,38,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(220,38,38,0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    body::after{
+      content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+      background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(220,38,38,0.08) 0%, transparent 60%);
+    }
 
     /* ── TOPBAR ── */
     .topbar{
       position:fixed;top:0;left:0;right:0;height:var(--topbar);z-index:200;
-      background:rgba(7,8,15,0.95);backdrop-filter:blur(16px);
-      border-bottom:1px solid var(--border);
+      background:#0a0a0a;border-bottom:1px solid var(--border2);
       display:flex;align-items:center;justify-content:space-between;
-      padding:0 1.5rem;
+      padding:0 1.25rem;
     }
     .topbar-left{display:flex;align-items:center;gap:1rem;}
-    .admin-badge{
-      display:flex;align-items:center;gap:0.5rem;
-      background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);
-      color:var(--danger);padding:0.3rem 0.75rem;border-radius:20px;font-size:0.72rem;
-      font-weight:500;letter-spacing:0.06em;text-transform:uppercase;
+    .brand{
+      font-family:var(--mono);font-size:0.88rem;font-weight:600;
+      color:var(--red);letter-spacing:0.08em;text-transform:uppercase;
     }
-    .brand{font-family:var(--font-head);font-size:1.15rem;font-weight:600;color:var(--accent);}
+    .brand-sep{color:var(--muted);margin:0 0.25rem;}
+    .brand-sub{font-family:var(--mono);font-size:0.72rem;color:var(--muted);letter-spacing:0.05em;}
+    .status-dot{
+      display:flex;align-items:center;gap:0.45rem;
+      font-family:var(--mono);font-size:0.65rem;color:var(--green);letter-spacing:0.08em;
+    }
+    .status-dot::before{
+      content:'';width:6px;height:6px;border-radius:50%;
+      background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;
+    }
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+    .topbar-center{
+      display:flex;align-items:center;gap:0.25rem;
+      font-family:var(--mono);font-size:0.68rem;color:var(--muted);
+    }
+    .topbar-center span{
+      padding:0.25rem 0.65rem;border-radius:4px;cursor:pointer;
+      transition:color 0.15s,background 0.15s;letter-spacing:0.05em;
+    }
+    .topbar-center a{
+      padding:0.25rem 0.65rem;border-radius:4px;cursor:pointer;
+      transition:color 0.15s,background 0.15s;letter-spacing:0.05em;
+      color:var(--muted);text-decoration:none;
+    }
+    .topbar-center a:hover{color:var(--text);background:rgba(255,255,255,0.05);}
+    .topbar-center a.active{color:var(--red);background:rgba(220,38,38,0.1);}
     .topbar-right{display:flex;align-items:center;gap:0.75rem;}
     .back-btn{
-      display:flex;align-items:center;gap:0.4rem;color:var(--muted);text-decoration:none;
-      font-size:0.78rem;padding:0.35rem 0.75rem;border-radius:8px;transition:color 0.2s,background 0.2s;
+      display:flex;align-items:center;gap:0.4rem;
+      font-family:var(--mono);font-size:0.68rem;color:var(--muted);
+      text-decoration:none;padding:0.3rem 0.7rem;border:1px solid var(--muted);
+      border-radius:4px;transition:all 0.15s;letter-spacing:0.04em;
     }
-    .back-btn:hover{color:var(--text);background:rgba(255,255,255,0.05);}
-    .avatar{
-      width:32px;height:32px;border-radius:50%;
-      background:linear-gradient(135deg,var(--danger),#fb923c);
-      display:flex;align-items:center;justify-content:center;
-      font-size:0.75rem;font-weight:600;color:#fff;
+    .back-btn:hover{color:var(--text);border-color:var(--text);}
+    .admin-chip{
+      font-family:var(--mono);font-size:0.62rem;letter-spacing:0.1em;
+      text-transform:uppercase;color:var(--red);
+      background:rgba(220,38,38,0.1);border:1px solid var(--border2);
+      padding:0.25rem 0.6rem;border-radius:3px;
     }
 
     /* ── LAYOUT ── */
@@ -60,159 +108,233 @@
 
     /* ── SIDEBAR ── */
     .sidebar{
-      width:var(--sidebar);flex-shrink:0;background:rgba(7,8,15,0.7);
-      border-right:1px solid var(--border);padding:1.25rem 0.75rem;
-      display:flex;flex-direction:column;gap:0.2rem;overflow-y:auto;
+      width:var(--sidebar);flex-shrink:0;
+      background:#0d0d0d;border-right:1px solid rgba(220,38,38,0.15);
+      display:flex;flex-direction:column;padding:1rem 0;overflow-y:auto;
     }
-    .sid-section{font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;
-      color:var(--muted);padding:0.5rem 0.85rem 0.25rem;}
+    .sid-section{
+      font-family:var(--mono);font-size:0.58rem;letter-spacing:0.18em;
+      text-transform:uppercase;color:var(--muted);
+      padding:0.85rem 1rem 0.3rem;
+    }
     .sid-link{
       display:flex;align-items:center;gap:0.6rem;
-      padding:0.55rem 0.85rem;border-radius:9px;color:var(--muted);
-      text-decoration:none;font-size:0.78rem;font-weight:400;
-      letter-spacing:0.02em;transition:color 0.2s,background 0.2s;
+      padding:0.52rem 1rem;color:var(--text2);text-decoration:none;
+      font-family:var(--sans);font-size:0.78rem;font-weight:400;
+      transition:color 0.15s,background 0.15s;border-left:2px solid transparent;
     }
-    .sid-link:hover{color:var(--text);background:rgba(167,139,250,0.08);}
-    .sid-link.active{color:var(--accent);background:rgba(167,139,250,0.1);font-weight:500;}
-    .sid-link.red{color:var(--danger);}
-    .sid-link.red:hover{background:rgba(248,113,113,0.08);}
-    .sid-link svg{width:14px;height:14px;flex-shrink:0;}
+    .sid-link:hover{color:var(--text);background:rgba(255,255,255,0.03);}
+    .sid-link.active{color:var(--red);background:rgba(220,38,38,0.06);border-left-color:var(--red);}
+    .sid-link svg{width:13px;height:13px;flex-shrink:0;opacity:0.6;}
+    .sid-link.active svg{opacity:1;}
+    .sid-link.danger{color:#ef444488;}
+    .sid-link.danger:hover{color:var(--red);background:rgba(220,38,38,0.05);}
     .sid-count{
-      margin-left:auto;background:rgba(167,139,250,0.15);color:var(--accent);
-      font-size:0.62rem;padding:0.1rem 0.45rem;border-radius:10px;font-weight:500;
+      margin-left:auto;font-family:var(--mono);font-size:0.62rem;
+      background:rgba(220,38,38,0.12);color:var(--red);
+      padding:0.1rem 0.4rem;border-radius:3px;
     }
-    .red .sid-count{background:rgba(248,113,113,0.15);color:var(--danger);}
+    .sid-divider{height:1px;background:rgba(220,38,38,0.1);margin:0.5rem 1rem;}
+    .sid-user{
+      margin:auto 0 0;padding:0.85rem 1rem;border-top:1px solid rgba(220,38,38,0.1);
+      font-family:var(--mono);font-size:0.65rem;color:var(--muted);
+    }
+    .sid-user strong{color:var(--text2);display:block;margin-bottom:0.15rem;}
 
     /* ── MAIN ── */
-    .main{flex:1;overflow-y:auto;padding:1.75rem 1.75rem;}
+    .main{flex:1;overflow-y:auto;padding:1.5rem 1.75rem;background:transparent;}
 
     /* ── FLASHES ── */
-    .flashes{margin-bottom:1.25rem;display:flex;flex-direction:column;gap:0.5rem;}
-    .flash{padding:0.65rem 1rem;border-radius:10px;font-size:0.82rem;border-left:3px solid;}
-    .flash.error  {background:rgba(248,113,113,0.1);border-color:var(--danger);color:#fca5a5;}
-    .flash.success{background:rgba(110,231,183,0.1);border-color:var(--success);color:#6ee7b7;}
-
-    /* ── PAGE HEADING ── */
-    .page-head{margin-bottom:1.5rem;}
-    .page-head h1{font-family:var(--font-head);font-size:2rem;font-weight:300;}
-    .page-head h1 em{font-style:italic;color:var(--danger);}
-    .page-head p{color:var(--muted);font-size:0.82rem;margin-top:0.25rem;}
-
-    /* ── STATS GRID ── */
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.85rem;margin-bottom:1.5rem;}
-    .stat-card{
-      background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-      padding:1.1rem;text-align:center;
+    .flashes{margin-bottom:1rem;display:flex;flex-direction:column;gap:0.4rem;}
+    .flash{
+      padding:0.6rem 1rem;border-radius:var(--radius);font-size:0.78rem;
+      font-family:var(--mono);border-left:3px solid;
     }
-    .stat-num{font-family:var(--font-head);font-size:2.2rem;font-weight:300;line-height:1;margin-bottom:0.2rem;}
-    .stat-label{font-size:0.67rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+    .flash.error  {background:rgba(239,68,68,0.08);border-color:var(--red);color:#fca5a5;}
+    .flash.success{background:rgba(34,197,94,0.08);border-color:var(--green);color:#86efac;}
+
+    /* ── PAGE HEADER ── */
+    .page-head{
+      display:flex;align-items:flex-start;justify-content:space-between;
+      margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(220,38,38,0.12);
+    }
+    .page-head-left h1{
+      font-family:var(--mono);font-size:1.4rem;font-weight:600;
+      color:var(--text);letter-spacing:-0.02em;
+    }
+    .page-head-left h1 .slash{color:var(--red);}
+    .page-head-left p{
+      font-size:0.75rem;color:var(--muted);margin-top:0.3rem;
+      font-family:var(--mono);letter-spacing:0.03em;
+    }
+    .page-head-right{
+      font-family:var(--mono);font-size:0.65rem;color:var(--muted);
+      text-align:right;line-height:1.8;
+    }
+
+    /* ── STATS ── */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.65rem;margin-bottom:1.5rem;}
+    .stat-card{
+      background:var(--card);border:1px solid rgba(220,38,38,0.12);
+      border-radius:var(--radius);padding:1rem;position:relative;overflow:hidden;
+    }
+    .stat-card::before{
+      content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,var(--stat-color,var(--red)),transparent);
+    }
+    .stat-num{
+      font-family:var(--mono);font-size:2rem;font-weight:600;
+      color:var(--stat-color,var(--red));line-height:1;margin-bottom:0.35rem;
+    }
+    .stat-label{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+    .stat-sub{font-family:var(--mono);font-size:0.6rem;color:var(--muted);margin-top:0.2rem;}
 
     /* ── SECTION TITLE ── */
-    .sec-title{
-      font-family:var(--font-head);font-size:1.2rem;font-weight:300;
-      margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;
+    .sec-head{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:0.75rem;
     }
-    .sec-title span{font-family:var(--font-body);font-size:0.72rem;color:var(--muted);font-weight:400;}
+    .sec-title{
+      font-family:var(--mono);font-size:0.75rem;font-weight:500;
+      color:var(--text2);letter-spacing:0.06em;text-transform:uppercase;
+      display:flex;align-items:center;gap:0.5rem;
+    }
+    .sec-title::before{content:'//';color:var(--red);font-weight:700;}
+    .sec-count{
+      font-family:var(--mono);font-size:0.62rem;color:var(--muted);
+      background:var(--card2);border:1px solid rgba(255,255,255,0.06);
+      padding:0.15rem 0.5rem;border-radius:3px;
+    }
 
     /* ── TABLE ── */
-    .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.5rem;}
+    .table-wrap{
+      background:var(--card);border:1px solid rgba(220,38,38,0.12);
+      border-radius:var(--radius);overflow:hidden;margin-bottom:1.5rem;
+    }
     table{width:100%;border-collapse:collapse;}
-    thead tr{border-bottom:1px solid var(--border2);}
-    th{padding:0.75rem 1rem;text-align:left;font-size:0.65rem;letter-spacing:0.12em;
-      text-transform:uppercase;color:var(--muted);font-weight:500;white-space:nowrap;}
-    td{padding:0.75rem 1rem;font-size:0.82rem;border-bottom:1px solid rgba(120,110,200,0.07);vertical-align:middle;}
+    thead tr{background:#101010;border-bottom:1px solid rgba(220,38,38,0.18);}
+    th{
+      padding:0.65rem 0.85rem;text-align:left;
+      font-family:var(--mono);font-size:0.6rem;letter-spacing:0.14em;
+      text-transform:uppercase;color:var(--muted);font-weight:500;white-space:nowrap;
+    }
+    td{
+      padding:0.65rem 0.85rem;font-size:0.78rem;
+      border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;
+    }
     tr:last-child td{border-bottom:none;}
-    tr:hover td{background:rgba(167,139,250,0.03);}
+    tr:hover td{background:rgba(220,38,38,0.025);}
+    .mono{font-family:var(--mono);font-size:0.72rem;}
 
     /* ── BADGES ── */
-    .badge{display:inline-flex;align-items:center;gap:0.25rem;padding:0.18rem 0.6rem;
-      border-radius:20px;font-size:0.65rem;font-weight:500;letter-spacing:0.04em;}
-    .badge-admin {background:rgba(167,139,250,0.15);color:var(--accent);}
-    .badge-blocked{background:rgba(248,113,113,0.15);color:var(--danger);}
-    .badge-active {background:rgba(110,231,183,0.12);color:var(--success);}
-    .badge-oauth  {background:rgba(251,191,36,0.12);color:var(--warn);}
-    .badge-dream  {background:rgba(167,139,250,0.1);color:var(--accent);font-family:var(--font-body);}
+    .badge{
+      display:inline-flex;align-items:center;gap:0.2rem;
+      padding:0.15rem 0.5rem;border-radius:3px;
+      font-family:var(--mono);font-size:0.62rem;font-weight:500;letter-spacing:0.04em;
+      text-transform:uppercase;
+    }
+    .badge-admin  {background:rgba(59,130,246,0.15);color:#93c5fd;border:1px solid rgba(59,130,246,0.25);}
+    .badge-blocked{background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);}
+    .badge-active {background:rgba(34,197,94,0.12);color:#86efac;border:1px solid rgba(34,197,94,0.25);}
+    .badge-google {background:rgba(234,179,8,0.12);color:#fde047;border:1px solid rgba(234,179,8,0.2);}
+    .badge-github {background:rgba(255,255,255,0.06);color:#d4d4d4;border:1px solid rgba(255,255,255,0.1);}
+    .badge-pass   {background:rgba(107,114,128,0.12);color:#9ca3af;border:1px solid rgba(107,114,128,0.2);}
+    .badge-dream  {background:rgba(249,115,22,0.1);color:#fdba74;border:1px solid rgba(249,115,22,0.2);}
+    /* emotion */
+    .emo-joy     {background:rgba(253,224,71,0.1);color:#fde047;}
+    .emo-sadness {background:rgba(96,165,250,0.1);color:#93c5fd;}
+    .emo-fear    {background:rgba(167,139,250,0.1);color:#c4b5fd;}
+    .emo-anger   {background:rgba(248,113,113,0.1);color:#fca5a5;}
+    .emo-surprise{background:rgba(52,211,153,0.1);color:#6ee7b7;}
+    .emo-disgust {background:rgba(251,146,60,0.1);color:#fdba74;}
+    .emo-neutral {background:rgba(148,163,184,0.1);color:#cbd5e1;}
 
-    /* ── ACTION BUTTONS ── */
-    .actions{display:flex;gap:0.35rem;flex-wrap:wrap;}
+    /* ── BUTTONS ── */
+    .actions{display:flex;gap:0.3rem;flex-wrap:wrap;}
     .btn{
-      display:inline-flex;align-items:center;gap:0.3rem;padding:0.32rem 0.7rem;
-      border-radius:7px;font-family:var(--font-body);font-size:0.72rem;font-weight:500;
+      display:inline-flex;align-items:center;gap:0.3rem;
+      padding:0.28rem 0.6rem;border-radius:4px;
+      font-family:var(--mono);font-size:0.65rem;font-weight:500;letter-spacing:0.04em;
       cursor:pointer;border:1px solid transparent;text-decoration:none;
-      transition:all 0.18s;white-space:nowrap;
+      transition:all 0.15s;white-space:nowrap;
     }
-    .btn-ghost {background:transparent;border-color:var(--border2);color:var(--muted);}
-    .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
-    .btn-danger{background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.3);color:var(--danger);}
-    .btn-danger:hover{background:rgba(248,113,113,0.2);}
-    .btn-success{background:rgba(110,231,183,0.1);border-color:rgba(110,231,183,0.3);color:var(--success);}
-    .btn-success:hover{background:rgba(110,231,183,0.2);}
-    .btn-warn  {background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.3);color:var(--warn);}
-    .btn-warn:hover{background:rgba(251,191,36,0.2);}
-    .btn-accent{background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.3);color:var(--accent);}
-    .btn-accent:hover{background:rgba(167,139,250,0.22);}
+    .btn svg{width:10px;height:10px;}
+    .btn-ghost  {background:transparent;border-color:rgba(255,255,255,0.1);color:var(--text2);}
+    .btn-ghost:hover{border-color:rgba(255,255,255,0.25);color:var(--text);}
+    .btn-danger {background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#fca5a5;}
+    .btn-danger:hover{background:rgba(239,68,68,0.2);}
+    .btn-success{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:#86efac;}
+    .btn-success:hover{background:rgba(34,197,94,0.2);}
+    .btn-warn   {background:rgba(234,179,8,0.1);border-color:rgba(234,179,8,0.3);color:#fde047;}
+    .btn-warn:hover{background:rgba(234,179,8,0.2);}
+    .btn-blue   {background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#93c5fd;}
+    .btn-blue:hover{background:rgba(59,130,246,0.2);}
+    .btn:disabled{opacity:0.35;cursor:not-allowed;}
 
-    /* ── SEARCH BAR ── */
-    .search-bar{
-      display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;
-      background:var(--card);border:1px solid var(--border);border-radius:10px;
-      padding:0.55rem 0.85rem;
+    /* ── SEARCH ── */
+    .search-wrap{
+      display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem;
+      background:var(--card);border:1px solid rgba(255,255,255,0.07);
+      border-radius:var(--radius);padding:0.5rem 0.85rem;
     }
-    .search-bar svg{color:var(--muted);flex-shrink:0;}
-    .search-bar input{
-      background:transparent;border:none;outline:none;color:var(--text);
-      font-family:var(--font-body);font-size:0.85rem;flex:1;
+    .search-wrap svg{color:var(--muted);flex-shrink:0;}
+    .search-wrap input{
+      background:transparent;border:none;outline:none;
+      color:var(--text);font-family:var(--mono);font-size:0.75rem;flex:1;
     }
-    .search-bar input::placeholder{color:var(--muted);}
+    .search-wrap input::placeholder{color:var(--muted);}
 
     /* ── DREAM TEXT ── */
-    .dream-text-cell{
-      max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-      color:var(--text);font-family:var(--font-head);font-weight:300;font-size:0.88rem;
+    .dt-cell{
+      max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+      font-size:0.8rem;color:var(--text);
     }
-    .interpretation-cell{
-      max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-      color:var(--muted);font-size:0.78rem;
+    .di-cell{
+      max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+      font-size:0.72rem;color:var(--muted);font-style:italic;
     }
 
-    /* Emotion badge colors */
-    .emo-joy     {background:rgba(253,224,71,0.15);color:#fde047;}
-    .emo-sadness {background:rgba(96,165,250,0.15);color:#93c5fd;}
-    .emo-fear    {background:rgba(167,139,250,0.15);color:#c4b5fd;}
-    .emo-anger   {background:rgba(248,113,113,0.15);color:#fca5a5;}
-    .emo-surprise{background:rgba(52,211,153,0.15);color:#6ee7b7;}
-    .emo-disgust {background:rgba(251,146,60,0.15);color:#fdba74;}
-    .emo-neutral {background:rgba(148,163,184,0.15);color:#cbd5e1;}
-
-    /* ── CONFIRM MODAL ── */
-    .modal-overlay{
-      display:none;position:fixed;inset:0;background:rgba(7,8,15,0.82);
-      backdrop-filter:blur(8px);z-index:999;align-items:center;justify-content:center;
+    /* ── USER AVATAR ── */
+    .u-avatar{
+      width:26px;height:26px;border-radius:3px;
+      background:var(--red-dim);border:1px solid rgba(220,38,38,0.3);
+      display:inline-flex;align-items:center;justify-content:center;
+      font-family:var(--mono);font-size:0.65rem;font-weight:600;color:var(--red);
+      flex-shrink:0;
     }
-    .modal-overlay.active{display:flex;}
-    .modal{
-      background:var(--card);border:1px solid var(--border2);border-radius:16px;
-      padding:2rem;max-width:380px;width:90%;text-align:center;
-    }
-    .modal h3{font-family:var(--font-head);font-size:1.4rem;margin-bottom:0.5rem;}
-    .modal p{color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem;line-height:1.6;}
-    .modal-actions{display:flex;gap:0.75rem;justify-content:center;}
 
     /* ── FILTER BANNER ── */
     .filter-banner{
       display:flex;align-items:center;justify-content:space-between;
-      background:rgba(167,139,250,0.07);border:1px solid rgba(167,139,250,0.2);
-      border-radius:10px;padding:0.65rem 1rem;margin-bottom:1rem;font-size:0.82rem;
+      background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);
+      border-radius:var(--radius);padding:0.55rem 0.85rem;margin-bottom:0.75rem;
+      font-family:var(--mono);font-size:0.72rem;color:var(--text2);
     }
-    .filter-banner a{color:var(--accent);text-decoration:none;font-size:0.75rem;}
+    .filter-banner a{color:#93c5fd;text-decoration:none;font-size:0.65rem;}
 
-    /* scrollbar */
-    ::-webkit-scrollbar{width:5px;}
+    /* ── CONFIRM MODAL ── */
+    .modal-overlay{
+      display:none;position:fixed;inset:0;
+      background:rgba(0,0,0,0.88);backdrop-filter:blur(4px);
+      z-index:999;align-items:center;justify-content:center;
+    }
+    .modal-overlay.active{display:flex;}
+    .modal{
+      background:var(--card);border:1px solid var(--border2);
+      border-radius:var(--radius);padding:1.75rem;max-width:360px;width:90%;
+    }
+    .modal-icon{font-size:1.75rem;margin-bottom:0.75rem;}
+    .modal h3{font-family:var(--mono);font-size:1rem;font-weight:600;margin-bottom:0.4rem;color:var(--red);}
+    .modal p{font-size:0.78rem;color:var(--text2);line-height:1.6;margin-bottom:1.25rem;}
+    .modal-actions{display:flex;gap:0.5rem;justify-content:flex-end;}
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar{width:4px;}
     ::-webkit-scrollbar-track{background:transparent;}
-    ::-webkit-scrollbar-thumb{background:rgba(167,139,250,0.2);border-radius:3px;}
+    ::-webkit-scrollbar-thumb{background:rgba(220,38,38,0.2);border-radius:2px;}
 
-    @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-    .fade{animation:fadeUp 0.35s ease both;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+    .fade{animation:fadeIn 0.3s ease both;}
   </style>
 </head>
 <body>
@@ -220,18 +342,17 @@
 <!-- ── TOPBAR ── -->
 <header class="topbar">
   <div class="topbar-left">
-    <span class="brand">Somnia</span>
-    <div class="admin-badge">
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Admin Panel
-    </div>
+    <span class="brand">SOMNIA<span class="brand-sep">/</span>ADMIN</span>
+    <div class="status-dot">SYSTEM ONLINE</div>
   </div>
+  <nav class="topbar-center">
+    <a href="{{ url_for('admin_panel') }}" class="{% if active_tab=='overview' %}active{% endif %}">OVERVIEW</a>
+    <a href="{{ url_for('admin_users') }}" class="{% if active_tab=='users' %}active{% endif %}">USERS</a>
+    <a href="{{ url_for('admin_dreams') }}" class="{% if active_tab=='dreams' %}active{% endif %}">DREAMS</a>
+  </nav>
   <div class="topbar-right">
-    <a href="{{ url_for('index') }}" class="back-btn">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-      Back to App
-    </a>
-    <div class="avatar">{{ session.get('username','A')[0].upper() }}</div>
+    <span class="admin-chip">⚠ RESTRICTED</span>
+    <a href="{{ url_for('index') }}" class="back-btn">← EXIT ADMIN</a>
   </div>
 </header>
 
@@ -239,36 +360,41 @@
 
   <!-- ── SIDEBAR ── -->
   <aside class="sidebar">
-    <div class="sid-section">Dashboard</div>
+    <div class="sid-section">Navigation</div>
     <a href="{{ url_for('admin_panel') }}" class="sid-link {% if active_tab=='overview' %}active{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-      Overview
+      Dashboard
     </a>
-
-    <div class="sid-section" style="margin-top:0.5rem;">Users</div>
     <a href="{{ url_for('admin_users') }}" class="sid-link {% if active_tab=='users' %}active{% endif %}">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      All Users
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Users
       <span class="sid-count">{{ users|length }}</span>
     </a>
-    <a href="{{ url_for('admin_users') }}#blocked" class="sid-link red">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-      Blocked
-      <span class="sid-count">{{ users|selectattr('is_blocked')|list|length }}</span>
-    </a>
-
-    <div class="sid-section" style="margin-top:0.5rem;">Dreams</div>
     <a href="{{ url_for('admin_dreams') }}" class="sid-link {% if active_tab=='dreams' %}active{% endif %}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      All Dreams
+      Dreams
       <span class="sid-count">{{ stats.total_dreams }}</span>
     </a>
 
-    <div class="sid-section" style="margin-top:0.5rem;">Account</div>
-    <a href="{{ url_for('logout') }}" class="sid-link red">
+    <div class="sid-divider"></div>
+    <div class="sid-section">Filters</div>
+    <a href="{{ url_for('admin_users') }}#blocked" class="sid-link danger">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+      Blocked Users
+      <span class="sid-count" style="background:rgba(239,68,68,0.15);color:var(--red);">{{ users|selectattr('is_blocked')|list|length }}</span>
+    </a>
+
+    <div class="sid-divider"></div>
+    <div class="sid-section">Session</div>
+    <a href="{{ url_for('logout') }}" class="sid-link danger">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       Logout
     </a>
+
+    <div class="sid-user">
+      <strong>{{ session.get('username','admin') }}</strong>
+      ADMINISTRATOR
+    </div>
   </aside>
 
   <!-- ── MAIN ── -->
@@ -284,84 +410,92 @@
       {% endif %}
     {% endwith %}
 
-    <!-- ════════════════════════════════════
-         OVERVIEW TAB
-    ════════════════════════════════════ -->
+    <!-- ════════════════════ OVERVIEW ════════════════════ -->
     {% if active_tab == 'overview' %}
     <div class="page-head fade">
-      <h1>Admin <em>Overview</em></h1>
-      <p>Full platform visibility. Handle with care.</p>
+      <div class="page-head-left">
+        <h1><span class="slash">//</span> Dashboard</h1>
+        <p>$ platform_status --verbose · Full admin access</p>
+      </div>
+      <div class="page-head-right">
+        <span style="color:var(--green);">● LIVE</span><br>
+        {{ stats.total_users }} users registered<br>
+        {{ stats.dreams_today }} dreams today
+      </div>
     </div>
 
     <!-- Stats -->
     <div class="stats-grid fade">
-      <div class="stat-card">
-        <div class="stat-num" style="color:var(--accent);">{{ stats.total_users }}</div>
+      <div class="stat-card" style="--stat-color:#ef4444;">
+        <div class="stat-num">{{ stats.total_users }}</div>
         <div class="stat-label">Total Users</div>
+        <div class="stat-sub">+{{ stats.new_users_week }} this week</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-num" style="color:var(--success);">{{ stats.new_users_week }}</div>
+      <div class="stat-card" style="--stat-color:#22c55e;">
+        <div class="stat-num">{{ stats.new_users_week }}</div>
         <div class="stat-label">New This Week</div>
+        <div class="stat-sub">registered users</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-num" style="color:var(--gold);">{{ stats.total_dreams }}</div>
+      <div class="stat-card" style="--stat-color:#f97316;">
+        <div class="stat-num">{{ stats.total_dreams }}</div>
         <div class="stat-label">Total Dreams</div>
+        <div class="stat-sub">all time</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-num" style="color:var(--accent2);">{{ stats.dreams_today }}</div>
+      <div class="stat-card" style="--stat-color:#3b82f6;">
+        <div class="stat-num">{{ stats.dreams_today }}</div>
         <div class="stat-label">Dreams Today</div>
+        <div class="stat-sub">last 24 hours</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-num" style="color:var(--danger);">{{ stats.blocked_users }}</div>
-        <div class="stat-label">Blocked Users</div>
+      <div class="stat-card" style="--stat-color:#ef4444;">
+        <div class="stat-num">{{ stats.blocked_users }}</div>
+        <div class="stat-label">Blocked</div>
+        <div class="stat-sub">suspended accounts</div>
       </div>
     </div>
 
-    <!-- Recent dreams -->
-    <div class="sec-title fade">Recent Dreams <span>— latest 50 across all users</span></div>
+    <!-- Recent dreams table -->
+    <div class="sec-head fade">
+      <div class="sec-title">Recent Activity</div>
+      <span class="sec-count">{{ dreams|length }} entries</span>
+    </div>
     <div class="table-wrap fade">
-      <table id="dreamsTable">
+      <table>
         <thead>
           <tr>
-            <th>#</th>
-            <th>User</th>
-            <th>Dream</th>
-            <th>Emotion</th>
-            <th>Sleep</th>
-            <th>Date</th>
-            <th>Action</th>
+            <th>ID</th><th>User</th><th>Dream</th>
+            <th>Emotion</th><th>Sleep</th><th>Date</th><th>Action</th>
           </tr>
         </thead>
         <tbody>
           {% for d in dreams %}
           <tr>
-            <td style="color:var(--muted);font-size:0.72rem;">{{ d.id }}</td>
+            <td class="mono" style="color:var(--muted);">#{{ d.id }}</td>
             <td>
-              <a href="{{ url_for('admin_user_dreams', user_id=d.user_id) }}" style="color:var(--accent);text-decoration:none;font-size:0.82rem;">{{ d.username }}</a>
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <div class="u-avatar">{{ d.username[0].upper() }}</div>
+                <a href="{{ url_for('admin_user_dreams', user_id=d.user_id) }}" style="color:#93c5fd;text-decoration:none;font-size:0.78rem;font-family:var(--mono);">{{ d.username }}</a>
+              </div>
             </td>
             <td>
-              <div class="dream-text-cell" title="{{ d.text }}">{{ d.text }}</div>
-              {% if d.interpretation %}
-              <div class="interpretation-cell" title="{{ d.interpretation }}">{{ d.interpretation }}</div>
-              {% endif %}
+              <div class="dt-cell" title="{{ d.text }}">{{ d.text }}</div>
+              {% if d.interpretation %}<div class="di-cell" title="{{ d.interpretation }}">{{ d.interpretation }}</div>{% endif %}
             </td>
             <td>
-              {% if d.emotion_primary %}
-              <span class="badge emo-{{ d.emotion_primary }}">{{ d.emotion_primary }}</span>
+              {% if d.emotion_primary %}<span class="badge emo-{{ d.emotion_primary }}">{{ d.emotion_primary }}</span>
               {% else %}<span style="color:var(--muted);">—</span>{% endif %}
             </td>
-            <td style="color:var(--gold);font-size:0.8rem;">
-              {% if d.sleep_quality %}{{ '★' * d.sleep_quality }}{% else %}—{% endif %}
+            <td class="mono" style="color:#eab308;font-size:0.7rem;">
+              {% if d.sleep_quality %}{{ '★'*d.sleep_quality }}{% else %}—{% endif %}
             </td>
-            <td style="color:var(--muted);font-size:0.75rem;white-space:nowrap;">
-              {{ d.created_at.strftime('%b %d, %Y') if d.created_at else '—' }}
+            <td class="mono" style="color:var(--muted);font-size:0.65rem;white-space:nowrap;">
+              {{ d.created_at.strftime('%Y-%m-%d') if d.created_at else '—' }}
             </td>
             <td>
-              <form method="POST" action="{{ url_for('admin_delete_dream', dream_id=d.id) }}" onsubmit="return confirmDelete(event, 'dream')">
+              <form method="POST" action="{{ url_for('admin_delete_dream', dream_id=d.id) }}" onsubmit="return confirmAction(event,'dream')">
                 <input type="hidden" name="next" value="{{ request.url }}">
                 <button class="btn btn-danger" type="submit">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-                  Delete
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+                  DEL
                 </button>
               </form>
             </td>
@@ -370,125 +504,96 @@
         </tbody>
       </table>
     </div>
-
     {% endif %}
 
-    <!-- ════════════════════════════════════
-         USERS TAB
-    ════════════════════════════════════ -->
+    <!-- ════════════════════ USERS ════════════════════ -->
     {% if active_tab == 'users' %}
     <div class="page-head fade">
-      <h1>Manage <em>Users</em></h1>
-      <p>{{ users|length }} registered users · {{ users|selectattr('is_blocked')|list|length }} blocked</p>
+      <div class="page-head-left">
+        <h1><span class="slash">//</span> User Management</h1>
+        <p>$ list_users --all --verbose · {{ users|length }} accounts found</p>
+      </div>
+      <div class="page-head-right">
+        <span style="color:var(--red);">{{ users|selectattr('is_blocked')|list|length }} blocked</span><br>
+        {{ users|selectattr('is_admin')|list|length }} admin(s)
+      </div>
     </div>
 
-    <div class="search-bar fade">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="userSearch" placeholder="Search by username or email…" oninput="filterTable('usersTable', this.value)">
+    <div class="search-wrap fade">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="search users..." oninput="filterTable('usersTable', this.value)">
     </div>
 
     <div class="table-wrap fade">
       <table id="usersTable">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Auth</th>
-            <th>Dreams</th>
-            <th>Joined</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th>ID</th><th>User</th><th>Email</th>
+            <th>Auth</th><th>Dreams</th><th>Joined</th>
+            <th>Status</th><th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for u in users %}
-          <tr id="user-row-{{ u.id }}">
-            <td style="color:var(--muted);font-size:0.72rem;">{{ u.id }}</td>
+          <tr>
+            <td class="mono" style="color:var(--muted);">{{ u.id }}</td>
             <td>
-              <div style="display:flex;align-items:center;gap:0.5rem;">
-                <div style="width:28px;height:28px;border-radius:50%;
-                  background:linear-gradient(135deg,var(--accent),var(--accent2));
-                  display:flex;align-items:center;justify-content:center;
-                  font-size:0.7rem;font-weight:600;color:#07080f;flex-shrink:0;">
-                  {{ u.username[0].upper() }}
+              <div style="display:flex;align-items:center;gap:0.6rem;">
+                <div class="u-avatar">{{ u.username[0].upper() }}</div>
+                <div>
+                  <div style="font-size:0.8rem;font-weight:500;">{{ u.username }}</div>
+                  {% if u.is_admin %}<span class="badge badge-admin">ADMIN</span>{% endif %}
                 </div>
-                <span style="font-weight:500;">{{ u.username }}</span>
-                {% if u.is_admin %}<span class="badge badge-admin">Admin</span>{% endif %}
               </div>
             </td>
-            <td style="color:var(--muted);font-size:0.78rem;">{{ u.email or '—' }}</td>
+            <td class="mono" style="color:var(--muted);font-size:0.68rem;">{{ u.email or '—' }}</td>
             <td>
               {% if u.oauth_id %}
-                {% if u.oauth_id.startswith('google:') %}
-                  <span class="badge badge-oauth">Google</span>
-                {% elif u.oauth_id.startswith('github:') %}
-                  <span class="badge badge-oauth">GitHub</span>
-                {% else %}
-                  <span class="badge badge-oauth">OAuth</span>
-                {% endif %}
-              {% else %}
-                <span style="color:var(--muted);font-size:0.75rem;">Password</span>
-              {% endif %}
+                {% if 'google' in u.oauth_id %}<span class="badge badge-google">Google</span>
+                {% elif 'github' in u.oauth_id %}<span class="badge badge-github">GitHub</span>
+                {% else %}<span class="badge badge-pass">OAuth</span>{% endif %}
+              {% else %}<span class="badge badge-pass">Password</span>{% endif %}
             </td>
             <td>
               <a href="{{ url_for('admin_user_dreams', user_id=u.id) }}" style="text-decoration:none;">
-                <span class="badge badge-dream">{{ u.dream_count }} dream{{ 's' if u.dream_count != 1 }}</span>
+                <span class="badge badge-dream">{{ u.dream_count }}</span>
               </a>
             </td>
-            <td style="color:var(--muted);font-size:0.75rem;white-space:nowrap;">
-              {{ u.created_at.strftime('%b %d, %Y') if u.created_at else '—' }}
+            <td class="mono" style="color:var(--muted);font-size:0.65rem;white-space:nowrap;">
+              {{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '—' }}
             </td>
             <td>
-              {% if u.is_blocked %}
-                <span class="badge badge-blocked">Blocked</span>
-              {% else %}
-                <span class="badge badge-active">Active</span>
-              {% endif %}
+              {% if u.is_blocked %}<span class="badge badge-blocked">BLOCKED</span>
+              {% else %}<span class="badge badge-active">ACTIVE</span>{% endif %}
             </td>
             <td>
               <div class="actions">
-                <!-- View dreams -->
-                <a href="{{ url_for('admin_user_dreams', user_id=u.id) }}" class="btn btn-ghost" title="View dreams">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  Dreams
+                <a href="{{ url_for('admin_user_dreams', user_id=u.id) }}" class="btn btn-ghost">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  VIEW
                 </a>
-                <!-- Block / Unblock -->
                 {% if not u.is_blocked %}
-                <form method="POST" action="{{ url_for('admin_block_user', user_id=u.id) }}" onsubmit="return confirmDelete(event, 'block')">
-                  <button class="btn btn-warn" type="submit" {% if u.id == session.get('user_id') %}disabled title="Cannot block yourself"{% endif %}>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-                    Block
-                  </button>
+                <form method="POST" action="{{ url_for('admin_block_user', user_id=u.id) }}" onsubmit="return confirmAction(event,'block')">
+                  <button class="btn btn-warn" type="submit" {% if u.id==session.get('user_id') %}disabled{% endif %}>BLOCK</button>
                 </form>
                 {% else %}
                 <form method="POST" action="{{ url_for('admin_unblock_user', user_id=u.id) }}">
-                  <button class="btn btn-success" type="submit">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-                    Unblock
-                  </button>
+                  <button class="btn btn-success" type="submit">UNBLOCK</button>
                 </form>
                 {% endif %}
-                <!-- Make / Remove admin -->
                 {% if not u.is_admin %}
-                <form method="POST" action="{{ url_for('admin_make_admin', user_id=u.id) }}" onsubmit="return confirmDelete(event, 'promote')">
-                  <button class="btn btn-accent" type="submit">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    Make Admin
-                  </button>
+                <form method="POST" action="{{ url_for('admin_make_admin', user_id=u.id) }}" onsubmit="return confirmAction(event,'promote')">
+                  <button class="btn btn-blue" type="submit">+ ADMIN</button>
                 </form>
                 {% else %}
-                <form method="POST" action="{{ url_for('admin_remove_admin', user_id=u.id) }}" onsubmit="return confirmDelete(event, 'demote')">
-                  <button class="btn btn-warn" type="submit" {% if u.id == session.get('user_id') %}disabled title="Cannot demote yourself"{% endif %}>
-                    Remove Admin
-                  </button>
+                <form method="POST" action="{{ url_for('admin_remove_admin', user_id=u.id) }}" onsubmit="return confirmAction(event,'demote')">
+                  <button class="btn btn-warn" type="submit" {% if u.id==session.get('user_id') %}disabled{% endif %}>- ADMIN</button>
                 </form>
                 {% endif %}
-                <!-- Delete user -->
-                <form method="POST" action="{{ url_for('admin_delete_user', user_id=u.id) }}" onsubmit="return confirmDelete(event, 'delete-user')">
-                  <button class="btn btn-danger" type="submit" {% if u.id == session.get('user_id') %}disabled title="Cannot delete yourself"{% endif %}>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
-                    Delete
+                <form method="POST" action="{{ url_for('admin_delete_user', user_id=u.id) }}" onsubmit="return confirmAction(event,'delete-user')">
+                  <button class="btn btn-danger" type="submit" {% if u.id==session.get('user_id') %}disabled{% endif %}>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+                    DEL
                   </button>
                 </form>
               </div>
@@ -500,67 +605,58 @@
     </div>
     {% endif %}
 
-    <!-- ════════════════════════════════════
-         DREAMS TAB
-    ════════════════════════════════════ -->
+    <!-- ════════════════════ DREAMS ════════════════════ -->
     {% if active_tab == 'dreams' %}
     <div class="page-head fade">
-      <h1>All <em>Dreams</em></h1>
-      <p>{{ dreams|length }} dreams shown{% if filter_user %} · filtered by {{ filter_user.username }}{% endif %}</p>
+      <div class="page-head-left">
+        <h1><span class="slash">//</span> Dream Records</h1>
+        <p>$ query dreams --all --limit=200{% if filter_user %} --user={{ filter_user.username }}{% endif %}</p>
+      </div>
+      <div class="page-head-right">{{ dreams|length }} records shown</div>
     </div>
 
     {% if filter_user %}
     <div class="filter-banner fade">
-      <span>Showing dreams for <strong style="color:var(--accent);">{{ filter_user.username }}</strong></span>
-      <a href="{{ url_for('admin_dreams') }}">✕ Clear filter</a>
+      <span>Filtered: <strong style="color:#93c5fd;font-family:var(--mono);">{{ filter_user.username }}</strong> · {{ dreams|length }} dreams</span>
+      <a href="{{ url_for('admin_dreams') }}">[ CLEAR FILTER ]</a>
     </div>
     {% endif %}
 
-    <div class="search-bar fade">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" placeholder="Search dreams…" oninput="filterTable('allDreamsTable', this.value)">
+    <div class="search-wrap fade">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="search dreams..." oninput="filterTable('dreamsTable', this.value)">
     </div>
 
     <div class="table-wrap fade">
-      <table id="allDreamsTable">
+      <table id="dreamsTable">
         <thead>
-          <tr>
-            <th>#</th>
-            <th>User</th>
-            <th>Dream Text</th>
-            <th>Interpretation</th>
-            <th>Emotion</th>
-            <th>Sleep</th>
-            <th>Date</th>
-            <th>Action</th>
-          </tr>
+          <tr><th>ID</th><th>User</th><th>Dream</th><th>Interpretation</th><th>Emotion</th><th>Sleep</th><th>Date</th><th>Action</th></tr>
         </thead>
         <tbody>
           {% for d in dreams %}
           <tr>
-            <td style="color:var(--muted);font-size:0.72rem;">{{ d.id }}</td>
+            <td class="mono" style="color:var(--muted);">#{{ d.id }}</td>
             <td>
-              <a href="{{ url_for('admin_user_dreams', user_id=d.user_id) }}" style="color:var(--accent);text-decoration:none;font-size:0.82rem;">{{ d.username }}</a>
+              <a href="{{ url_for('admin_user_dreams', user_id=d.user_id) }}" style="color:#93c5fd;text-decoration:none;font-family:var(--mono);font-size:0.72rem;">{{ d.username }}</a>
             </td>
-            <td><div class="dream-text-cell" title="{{ d.text }}">{{ d.text }}</div></td>
-            <td><div class="interpretation-cell" title="{{ d.interpretation or '' }}">{{ d.interpretation or '—' }}</div></td>
+            <td><div class="dt-cell" title="{{ d.text }}">{{ d.text }}</div></td>
+            <td><div class="di-cell" title="{{ d.interpretation or '' }}">{{ d.interpretation or '—' }}</div></td>
             <td>
-              {% if d.emotion_primary %}
-              <span class="badge emo-{{ d.emotion_primary }}">{{ d.emotion_primary }}</span>
+              {% if d.emotion_primary %}<span class="badge emo-{{ d.emotion_primary }}">{{ d.emotion_primary }}</span>
               {% else %}<span style="color:var(--muted);">—</span>{% endif %}
             </td>
-            <td style="color:var(--gold);font-size:0.8rem;">
-              {% if d.sleep_quality %}{{ '★' * d.sleep_quality }}{% else %}—{% endif %}
+            <td class="mono" style="color:#eab308;font-size:0.7rem;">
+              {% if d.sleep_quality %}{{ '★'*d.sleep_quality }}{% else %}—{% endif %}
             </td>
-            <td style="color:var(--muted);font-size:0.75rem;white-space:nowrap;">
-              {{ d.created_at.strftime('%b %d, %Y') if d.created_at else '—' }}
+            <td class="mono" style="color:var(--muted);font-size:0.65rem;white-space:nowrap;">
+              {{ d.created_at.strftime('%Y-%m-%d') if d.created_at else '—' }}
             </td>
             <td>
-              <form method="POST" action="{{ url_for('admin_delete_dream', dream_id=d.id) }}" onsubmit="return confirmDelete(event, 'dream')">
+              <form method="POST" action="{{ url_for('admin_delete_dream', dream_id=d.id) }}" onsubmit="return confirmAction(event,'dream')">
                 <input type="hidden" name="next" value="{{ request.url }}">
                 <button class="btn btn-danger" type="submit">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
-                  Delete
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+                  DEL
                 </button>
               </form>
             </td>
@@ -577,60 +673,50 @@
 <!-- ── CONFIRM MODAL ── -->
 <div class="modal-overlay" id="confirmModal">
   <div class="modal">
-    <h3 id="modalTitle">Are you sure?</h3>
+    <div class="modal-icon" id="modalIcon">⚠️</div>
+    <h3 id="modalTitle">CONFIRM ACTION</h3>
     <p id="modalMsg">This action cannot be undone.</p>
     <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-danger" id="modalConfirmBtn">Confirm</button>
+      <button class="btn btn-ghost" onclick="closeModal()">[ CANCEL ]</button>
+      <button class="btn btn-danger" id="modalConfirmBtn">[ CONFIRM ]</button>
     </div>
   </div>
 </div>
 
 <script>
-  // ── Confirm modal ──────────────────────────────────────────────────────────
   let pendingForm = null;
-  const modal = document.getElementById('confirmModal');
+  const modal      = document.getElementById('confirmModal');
   const modalTitle = document.getElementById('modalTitle');
   const modalMsg   = document.getElementById('modalMsg');
+  const modalIcon  = document.getElementById('modalIcon');
   const confirmBtn = document.getElementById('modalConfirmBtn');
 
-  const confirmMessages = {
-    'dream':       ['Delete Dream?',      'This will permanently remove this dream entry.'],
-    'block':       ['Block User?',        'The user will be unable to log in until unblocked.'],
-    'delete-user': ['Delete User?',       'This will permanently delete the user and ALL their dreams. Cannot be undone.'],
-    'promote':     ['Make Admin?',        'This user will gain full admin access to the panel.'],
-    'demote':      ['Remove Admin?',      'This will revoke their admin privileges.'],
+  const confirmCfg = {
+    'dream':       ['⚠️', 'DELETE DREAM?',       'This dream record will be permanently erased.', 'btn-danger'],
+    'block':       ['🚫', 'BLOCK USER?',          'User will be suspended and unable to log in.',   'btn-warn'],
+    'delete-user': ['💀', 'DELETE USER?',         'ALL user data and dreams will be permanently destroyed. This cannot be undone.', 'btn-danger'],
+    'promote':     ['🛡️', 'GRANT ADMIN ACCESS?',  'This user will gain full administrative privileges.', 'btn-blue'],
+    'demote':      ['⬇️', 'REVOKE ADMIN ACCESS?', 'Admin privileges will be removed from this user.', 'btn-warn'],
   };
 
-  function confirmDelete(e, type) {
+  function confirmAction(e, type) {
     e.preventDefault();
     pendingForm = e.target.closest('form');
-    const [title, msg] = confirmMessages[type] || ['Confirm?', 'This action cannot be undone.'];
+    const [icon, title, msg, btnClass] = confirmCfg[type] || ['⚠️','CONFIRM?','This cannot be undone.','btn-danger'];
+    modalIcon.textContent  = icon;
     modalTitle.textContent = title;
     modalMsg.textContent   = msg;
-    confirmBtn.className   = type === 'delete-user' ? 'btn btn-danger' : (type === 'block' ? 'btn btn-warn' : 'btn btn-danger');
+    confirmBtn.className   = 'btn ' + btnClass;
     modal.classList.add('active');
     return false;
   }
+  function closeModal(){ modal.classList.remove('active'); pendingForm = null; }
+  confirmBtn.addEventListener('click', () => { if(pendingForm) pendingForm.submit(); closeModal(); });
+  modal.addEventListener('click', e => { if(e.target===modal) closeModal(); });
 
-  function closeModal() {
-    modal.classList.remove('active');
-    pendingForm = null;
-  }
-
-  confirmBtn.addEventListener('click', () => {
-    if (pendingForm) { pendingForm.submit(); }
-    closeModal();
-  });
-
-  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-
-  // ── Table search filter ────────────────────────────────────────────────────
-  function filterTable(tableId, query) {
-    const rows = document.querySelectorAll('#' + tableId + ' tbody tr');
-    const q = query.toLowerCase();
-    rows.forEach(row => {
-      row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  function filterTable(id, q){
+    document.querySelectorAll('#'+id+' tbody tr').forEach(row=>{
+      row.style.display = row.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
     });
   }
 </script>
