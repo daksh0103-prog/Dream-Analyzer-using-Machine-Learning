@@ -115,7 +115,21 @@ def index():
             "symbols": symbols,
             "sleep_quality": sleep_quality,
         }
-    return render_template("index.html", result=result)
+
+    import json
+    recent_dreams = db.get_dreams(session["user_id"], limit=4)
+    top_symbols   = db.get_top_symbols(session["user_id"], limit=3)
+    all_dreams    = db.get_dreams(session["user_id"], limit=90)
+    dream_dates   = list({str(d["created_at"].date()) for d in all_dreams if d["created_at"]})
+    dream_dates_json = json.dumps(dream_dates)
+
+    return render_template(
+        "index.html",
+        result=result,
+        recent_dreams=recent_dreams,
+        top_symbols=top_symbols,
+        dream_dates_json=dream_dates_json,
+    )
 
 
 @app.route("/history")
